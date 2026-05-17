@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 8 Results - Gemion Function</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            display: flex; min-height: 100vh; font-family: 'Segoe UI', sans-serif;
+            background-color: #1a1a1a; color: #fff;
+        }
+
+        /* --- CONTROL PANEL SIDEBAR & MOBILE SYSTEM RESPONSIVENESS --- */
+        .sidebar-panel {
+            width: 420px; background-color: #25252b; padding: 20px;
+            overflow-y: auto; height: 100vh; border-right: 2px solid #333;
+        }
+        .sidebar-panel h2 { 
+            margin-bottom: 15px; font-size: 20px; border-bottom: 1px solid #444; 
+            padding-bottom: 5px; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center;
+        }
+        .sidebar-panel h2::after { content: '▼'; font-size: 12px; transition: transform 0.2s; }
+        .sidebar-panel h2.collapsed::after { content: '►'; }
+        
+        .collapsible-content { transition: max-height 0.2s ease-out, opacity 0.2s; max-height: 5000px; opacity: 1; overflow: visible; }
+        .collapsible-content.collapsed { max-height: 0 !important; opacity: 0 !important; overflow: hidden !important; margin-bottom: 0 !important; padding: 0 !important; }
+
+        /* --- RAINBOW PROGRESSION THEME STYLING --- */
+        .sidebar-panel h2.tournament-title { color: #ef4444; } /* Red */
+        .sidebar-panel h2.roster-title { color: #f97316; }     /* Orange */
+        .sidebar-panel h2.layout-title { color: #eab308; }     /* Yellow */
+        .sidebar-panel h2.character-title { color: #22c55e; }  /* Green */
+        .sidebar-panel h2.gem-title { color: #3b82f6; }        /* Blue */
+        
+        .form-section { background: #1e1e24; padding: 12px; margin-bottom: 15px; border-radius: 6px; border-left: 4px solid #fff; position: relative; }
+        .form-section.tournament-section { border-left-color: #ef4444; }
+        .form-section.roster-section { border-left-color: #f97316; }
+        .form-section.layout-config-section { border-left-color: #eab308; }
+        .form-section.character-section { border-left-color: #22c55e; }
+        .form-section.gem-section { border-left-color: #3b82f6; }
+        
+        .form-section h3 { font-size: 14px; margin-bottom: 10px; color: #ccc; }
+        .form-row { display: flex; gap: 10px; margin-bottom: 8px; align-items: center; }
+        input[type="text"], input[type="color"], select {
+            width: 100%; padding: 6px; background: #2d2d35; border: 1px solid #444; color: #fff; border-radius: 4px; font-size: 13px;
+        }
+        input[type="color"] { height: 32px; padding: 2px; cursor: pointer; }
+        input[type="range"] { width: 100%; cursor: pointer; accent-color: #c95c22; }
+        input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: #22c55e; }
+        label { font-size: 11px; color: #aaa; display: block; margin-bottom: 2px; }
+        .input-group { flex: 1; position: relative; }
+        .range-value { font-size: 11px; color: #ffdd57; font-weight: bold; margin-left: 5px; }
+
+        /* Clear button interface styles */
+        .clear-slot-btn {
+            background: #4b2323; border: 1px solid #ef4444; color: #fca5a5;
+            font-size: 10px; font-weight: bold; padding: 3px 8px; border-radius: 4px;
+            cursor: pointer; transition: background 0.15s; width: auto; margin-bottom: 6px;
+        }
+        .clear-slot-btn:hover { background: #7f1d1d; color: #fff; }
+        
+        .autocomplete-suggestions {
+            position: absolute; top: 100%; left: 0; right: 0; background: #2d2d35;
+            border: 1px solid #555; z-index: 999; max-height: 150px; overflow-y: auto;
+            border-radius: 0 0 4px 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+        }
+        .suggestion-item { padding: 6px 10px; cursor: pointer; font-size: 12px; color: #fff; }
+        .suggestion-item:hover { background: #444; color: #ffdd57; }
+
+        button.download-btn {
+            width: 100%; padding: 12px; background: #0284c7; border: none; color: white; font-weight: bold; font-size: 15px; border-radius: 6px; cursor: pointer; margin-top: 10px; transition: 0.2s;
+        }
+        button.download-btn:hover { background: #0369a1; }
+
+        /* --- LIVE CANVAS PREVIEW AREA --- */
+        .preview-pane {
+            flex: 1; display: flex; background-color: #111; padding: 20px; overflow: auto;
+        }
+        
+        .graphic-canvas {
+            width: 960px; height: 540px; position: relative; display: flex;
+            flex-direction: column; justify-content: center; align-items: center;
+            background-color: #0d0d11; background-size: cover; background-position: center; overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            margin: auto; flex-shrink: 0;
+        }
+
+        /* Isolated Symmetrical Layout Matrix Container */
+        .grid-matrix-container {
+            display: grid; grid-template-columns: 310px 601px; justify-content: center; grid-template-rows: 170px 160px;
+            gap: 25px; transform-origin: center center; width: 936px; height: 355px;
+        }
+
+        /* FIX 1: Corner triangles generated via CSS Borders instead of linear-gradients. 
+           This permanently prevents html2canvas from rendering anti-aliased dark/orange bleed lines */
+        .graphic-canvas::before, .graphic-canvas::after {
+            content: ''; position: absolute; z-index: 2; pointer-events: none;
+            width: 0; height: 0; background: transparent;
+        }
+        .graphic-canvas::before {
+            top: 0; left: 0;
+            border-top-style: solid;
+            border-top-color: var(--canvas-secondary-color, #c95c22);
+            border-top-width: var(--triangle-height, 79px);
+            border-right-style: solid;
+            border-right-color: transparent;
+            border-right-width: var(--triangle-width, 184px);
+        }
+        .graphic-canvas::after {
+            bottom: 0; right: 0;
+            border-bottom-style: solid;
+            border-bottom-color: var(--canvas-secondary-color, #c95c22);
+            border-bottom-width: var(--triangle-height, 79px);
+            border-left-style: solid;
+            border-left-color: transparent;
+            border-left-width: var(--triangle-width, 184px);
+        }
+
+        .corner-text { 
+            position: absolute; font-family: 'Arial Black', sans-serif; letter-spacing: 1px; z-index: 20; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            white-space: normal; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.1;
+        }
+        .tl-text, .tr-text { max-width: var(--corner-max-width-top, 230px); }
+        .bl-text, .br-text { max-width: var(--corner-max-width-bottom, 300px); }
+        .tr-text, .br-text { text-align: right; }
+
+        /* Structural Assignments */
+        .pos-1-wrapper { grid-column: 1; grid-row: 1 / span 2; position: relative; height: 355px; }
+        .row-top-right { grid-column: 2; grid-row: 1; display: grid; grid-template-columns: repeat(3, 185px); gap: 23px; height: 170px; }
+        .row-bottom-right { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: repeat(4, 133px); gap: 23px; height: 160px; }
+
+        /* The Roster Character Frame System */
+        .slot-frame {
+            position: relative; width: 100%; height: 100%;
+            border-style: solid; display: flex; flex-direction: column; overflow: visible; opacity: 1; transition: opacity 0.2s;
+        }
+        .slot-frame.hidden-empty { border: none !important; background: transparent !important; }
+        .slot-frame.hidden-empty * { display: none !important; }
+
+        .image-container { position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; z-index: 1; }
+        
+        /* Render Formatting Specs */
+        .char-full { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+        .pane-split-container { display: flex; width: 100%; height: 100%; }
+        .pane-half { width: 50%; height: 100%; overflow: hidden; position: relative; }
+        .pane-half img { position: absolute; width: 200%; height: 100%; object-fit: cover; top: 0; }
+        
+        /* Tri-Line Split Divider Layout Container */
+        .pane-divider-group { display: flex; height: 100%; z-index: 5; position: absolute; left: 50%; transform: translateX(-50%); }
+        .pane-divider-black-l { height: 100%; background-color: #000; }
+        .pane-divider-white { height: 100%; background-color: #fff; }
+        .pane-divider-black-r { height: 100%; background-color: #000; }
+
+        /* Floating Multi-Layered Gem Border System */
+        .gem-box { position: absolute; z-index: 12; background-size: cover; background-position: center; }
+
+        /* Identity Cards & Absolute Layered Typography Overlays */
+        .rank-tag { 
+            position: absolute; font-family: 'Arial Black', sans-serif; font-weight: 900; color: #fff; 
+            text-shadow: 3px 3px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000; 
+            z-index: 10; 
+        }
+
+        /* Pure Background Layer (Solid Vector Shape Base) */
+        .meta-container { 
+            position: absolute; bottom: -1px; left: -1px; right: -1px; 
+            z-index: 30; pointer-events: none;
+        }
+
+        /* Decoupled Foreground Layer */
+        .text-overlay-container {
+            position: absolute; bottom: 0; left: 0; right: 0;
+            text-align: center; font-family: 'Arial Black', sans-serif;
+            z-index: 35; display: flex; flex-direction: column;
+            justify-content: flex-end; align-items: center; pointer-events: none;
+            padding-left: 6px; padding-right: 6px;
+        }
+
+        .player-name { 
+            font-weight: bold; color: #fff; 
+            text-shadow: 0px 0px 6px #000000, 0px 0px 6px #000000, 0px 0px 6px #000000;
+            display: inline-block; width: 100%; text-align: center;
+            transform: scaleY(1.3); transform-origin: bottom;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .twitter-handle { 
+            font-family: sans-serif; font-weight: bold; color: #fff;
+            text-shadow: 1px 1px 3px #000, -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000;
+            width: 100%; text-align: center; display: block;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        /* --- MOBILE VIEW PORTRAIT OVERRIDES --- */
+        @media (max-width: 900px) {
+            body { flex-direction: column; overflow-y: auto; }
+            .sidebar-panel { width: 100%; height: auto; border-right: none; border-bottom: 2px solid #333; order: 2; padding: 15px; }
+            .preview-pane { 
+                width: 100%; height: auto; min-height: 320px; padding: 10px; position: sticky; top: 0; z-index: 1000; 
+                background-color: #0a0a0c; border-bottom: 2px solid #222; order: 1; overflow: hidden;
+            }
+            .graphic-canvas { transform: scale(0.65); margin: -80px auto; }
+        }
+        @media (max-width: 600px) { .graphic-canvas { transform: scale(0.42); margin: -140px auto; } }
+        @media (max-width: 400px) { .graphic-canvas { transform: scale(0.32); margin: -170px auto; } }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar-panel">
+        <h2 class="tournament-title" onclick="toggleSection('tournamentContent')">Tournament Info</h2>
+        <div id="tournamentContent" class="collapsible-content">
+            <div class="form-section tournament-section">
+                <div class="form-row">
+                    <div class="input-group"><label>Organizer (Top-Left Text)</label><input type="text" id="tlInput" value="Nagooyen" placeholder="Organizer" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Date (Top-Right Text)</label><input type="text" id="trInput" placeholder="Date" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Tournament (Bottom-Left Text)</label><input type="text" id="blInput" value="Tournament #1 - 420 Entrants" placeholder="Subtitle" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>URL (Bottom-Right Text)</label><input type="text" id="brInput" value="https://tinyurl.com/GemionTourneys" placeholder="Bracket URL" oninput="updateCanvas()"></div>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="roster-title" onclick="toggleSection('rosterContent')">Participants Info</h2>
+        <div id="rosterContent" class="collapsible-content">
+            <div id="slotsControlContainer"></div>
+        </div>
+
+        <h2 class="layout-title collapsed" onclick="toggleSection('layoutContent')">Layout Configurations</h2>
+        <div id="layoutContent" class="collapsible-content collapsed">
+            <div class="form-section layout-config-section">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Canvas Background Image</label>
+                        <input type="text" id="bgInput" value="https://cdn.discordapp.com/attachments/950601093073743922/1505431507253329930/top8_background.png?ex=6a0a99d8&is=6a094858&hm=78562bc92fd08d036e2d21b5e72af5bf4b031ffcc2c57250a36ddb68574bf598&" placeholder="PNG URL" oninput="updateCanvas()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Primary Color</label>
+                        <input type="color" id="primaryColorInput" value="#014101" onchange="updateCanvas()">
+                    </div>
+                    <div class="input-group">
+                        <label>Secondary Color</label>
+                        <input type="color" id="secondaryColorInput" value="#c95c22" onchange="updateCanvas()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Base Border Thickness <span id="borderValueDisplay" class="range-value">8px</span></label>
+                        <input type="range" id="borderThicknessInput" min="4" max="18" value="8" oninput="updateCanvas()">
+                    </div>
+                    <div class="input-group">
+                        <label>Grid Horizontal Scale <span id="hScaleValueDisplay" class="range-value">96%</span></label>
+                        <input type="range" id="hScaleInput" min="60" max="100" value="96" oninput="updateCanvas()">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Corner Width Scale <span id="cWidthScaleValueDisplay" class="range-value">100%</span></label>
+                        <input type="range" id="cWidthScaleInput" min="0" max="150" value="100" oninput="updateCanvas()">
+                    </div>
+                    <div class="input-group">
+                        <label>Corner Height Scale <span id="cHeightScaleValueDisplay" class="range-value">100%</span></label>
+                        <input type="range" id="cHeightScaleInput" min="0" max="150" value="100" oninput="updateCanvas()">
+                    </div>
+                </div>
+                
+                <h3>Split Divider Configuration (Widths)</h3>
+                <div class="form-row">
+                    <div class="input-group"><label>1st White <span id="w1Val" class="range-value">5px</span></label><input type="range" id="w1Input" min="1" max="12" value="5" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>2-4 White <span id="w2Val" class="range-value">4px</span></label><input type="range" id="w2Input" min="1" max="12" value="4" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>5-8 White <span id="w3Val" class="range-value">3px</span></label><input type="range" id="w3Input" min="1" max="12" value="3" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>1st Black <span id="b1Val" class="range-value">3px</span></label><input type="range" id="b1Input" min="1" max="12" value="3" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>2-4 Black <span id="b2Val" class="range-value">2px</span></label><input type="range" id="b2Input" min="1" max="12" value="2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>5-8 Black <span id="b3Val" class="range-value">1px</span></label><input type="range" id="b3Input" min="1" max="12" value="1" oninput="updateCanvas()"></div>
+                </div>
+
+                <h3>Typography Sizes & Positions</h3>
+                <div class="form-row">
+                    <div class="input-group"><label>Placing Num Size <span id="pSizeVal" class="range-value">60px</span></label><input type="range" id="pSizeInput" min="24" max="72" value="60" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Corner Padding <span id="cPadVal" class="range-value">30px</span></label><input type="range" id="cPadInput" min="0" max="60" value="30" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Top-Left Size <span id="tlSizeVal" class="range-value">20px</span></label><input type="range" id="tlSizeInput" min="8" max="48" value="20" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Top-Right Size <span id="trSizeVal" class="range-value">20px</span></label><input type="range" id="trSizeInput" min="8" max="48" value="20" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Bottom-Left Size <span id="blSizeVal" class="range-value">16px</span></label><input type="range" id="blSizeInput" min="8" max="48" value="16" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Bottom-Right Size <span id="brSizeVal" class="range-value">12px</span></label><input type="range" id="brSizeInput" min="8" max="48" value="12" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Corner Text Max Width Top <span id="cMaxWidthTopVal" class="range-value">230px</span></label><input type="range" id="cMaxWidthTopInput" min="200" max="400" value="230" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Corner Text Max Width Bottom <span id="cMaxWidthBottomVal" class="range-value">300px</span></label><input type="range" id="cMaxWidthBottomInput" min="200" max="400" value="300" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Player Name Size <span id="nSizeVal" class="range-value">32px</span></label><input type="range" id="nSizeInput" min="14" max="64" value="32" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Twitter Size <span id="tSizeVal" class="range-value">20px</span></label><input type="range" id="tSizeInput" min="8" max="54" value="20" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Placing 2-4 Font Scale % <span id="scale24ValueDisplay" class="range-value">60%</span></label><input type="range" id="scale24Input" min="50" max="100" value="60" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Placing 5-8 Font Scale % <span id="scale58ValueDisplay" class="range-value">50%</span></label><input type="range" id="scale58Input" min="50" max="100" value="50" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Name-Twitter Gap <span id="ntGapVal" class="range-value">0px</span></label><input type="range" id="ntGapInput" min="-20" max="16" value="0" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Twitter Bottom Padding <span id="tBotPadVal" class="range-value">5px</span></label><input type="range" id="tBotPadInput" min="0" max="24" value="5" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Banner Max H% <span id="bHeightVal" class="range-value">35%</span></label><input type="range" id="bHeightInput" min="10" max="50" value="35" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Banner Slant Angle <span id="slantVal" class="range-value">-25px</span></label><input type="range" id="slantInput" min="-25" max="25" value="-25" oninput="updateCanvas()"></div>
+                </div>
+
+                <h3>Gem Layout Border Tuning</h3>
+                <div class="form-row">
+                    <div class="input-group"><label>Base Gem Size <span id="gemScaleValueDisplay" class="range-value">42px</span></label><input type="range" id="gemScaleInput" min="24" max="56" value="42" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Gem Offset <span id="gemPaddingValueDisplay" class="range-value">3px</span></label><input type="range" id="gemPaddingInput" min="2" max="15" value="3" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Canvas Vert Padding <span id="vPaddingValueDisplay" class="range-value">92px</span></label><input type="range" id="vPaddingInput" min="20" max="140" value="92" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>1st Gem White <span id="gw1Val" class="range-value">2px</span></label><input type="range" id="gw1Input" min="1" max="6" value="2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>1st Gem Black <span id="gb1Val" class="range-value">2px</span></label><input type="range" id="gb1Input" min="1" max="6" value="2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Rest Gem White <span id="gwrVal" class="range-value">1px</span></label><input type="range" id="gwrInput" min="1" max="6" value="1" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Rest Gem Black <span id="gbrVal" class="range-value">1px</span></label><input type="range" id="gbrInput" min="1" max="6" value="1" oninput="updateCanvas()"></div>
+                </div>
+
+                <div class="form-row" style="margin-top: 12px;">
+                    <input type="checkbox" id="opaqueBgCheckbox" onchange="updateCanvas()">
+                    <label forbid="opaqueBgCheckbox" style="display:inline; margin-left:5px; font-weight:bold; color:#fff;">Force Opaque Black Square Backgrounds</label>
+                </div>
+            </div>
+        </div>
+
+        <h2 class="character-title collapsed" onclick="toggleSection('characterContent')">Character Info</h2>
+        <div id="characterContent" class="collapsible-content collapsed">
+            <div id="characterConfigContainer"></div>
+        </div>
+
+        <h2 class="gem-title collapsed" onclick="toggleSection('gemContent')">Gem Info</h2>
+        <div id="gemContent" class="collapsible-content collapsed">
+            <div id="gemConfigContainer"></div>
+        </div>
+
+        <button class="download-btn" onclick="exportFinishedPNG()">Download Graphic (.PNG)</button>
+    </div>
+
+    <div class="preview-pane">
+        <div class="graphic-canvas" id="canvasTarget">
+            <div class="corner-text tl-text" id="textTL"></div>
+            <div class="corner-text tr-text" id="textTR"></div>
+            <div class="corner-text bl-text" id="textBL"></div>
+            <div class="corner-text br-text" id="textBR"></div>
+
+            <div class="grid-matrix-container" id="matrixGridTarget">
+                <div class="pos-1-wrapper">
+                    <div class="slot-frame" id="frame-1"><span class="rank-tag" id="rank-1">1</span><div class="image-container" id="img-container-1"></div><div class="meta-container" id="meta-1"></div><div class="text-overlay-container" id="overlay-1"></div></div>
+                </div>
+
+                <div class="row-top-right">
+                    <div class="slot-frame" id="frame-2"><span class="rank-tag" id="rank-2">2</span><div class="image-container" id="img-container-2"></div><div class="meta-container" id="meta-2"></div><div class="text-overlay-container" id="overlay-2"></div></div>
+                    <div class="slot-frame" id="frame-3"><span class="rank-tag" id="rank-3">3</span><div class="image-container" id="img-container-3"></div><div class="meta-container" id="meta-3"></div><div class="text-overlay-container" id="overlay-3"></div></div>
+                    <div class="slot-frame" id="frame-4"><span class="rank-tag" id="rank-4">4</span><div class="image-container" id="img-container-4"></div><div class="meta-container" id="meta-4"></div><div class="text-overlay-container" id="overlay-4"></div></div>
+                </div>
+
+                <div class="row-bottom-right">
+                    <div class="slot-frame" id="frame-5"><span class="rank-tag" id="rank-5">5</span><div class="image-container" id="img-container-5"></div><div class="meta-container" id="meta-5"></div><div class="text-overlay-container" id="overlay-5"></div></div>
+                    <div class="slot-frame" id="frame-6"><span class="rank-tag" id="rank-6">5</span><div class="image-container" id="img-container-6"></div><div class="meta-container" id="meta-6"></div><div class="text-overlay-container" id="overlay-6"></div></div>
+                    <div class="slot-frame" id="frame-7"><span class="rank-tag" id="rank-7">7</span><div class="image-container" id="img-container-7"></div><div class="meta-container" id="meta-7"></div><div class="text-overlay-container" id="overlay-7"></div></div>
+                    <div class="slot-frame" id="frame-8"><span class="rank-tag" id="rank-8">7</span><div class="image-container" id="img-container-8"></div><div class="meta-container" id="meta-8"></div><div class="text-overlay-container" id="overlay-8"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const charEnumMap = {
+            "Arisette": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150856557760582/arisette1.png?ex=6a099478&is=6a0842f8&hm=c6575e7f97c06a4127c85419f74a5abc3adf51bcdda6667ef3bc2234894f33a9&", offset: -17 },
+            "AZ": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150856935510129/az1.png?ex=6a099478&is=6a0842f8&hm=f998c2e7eb70a14926cfe23f7b9a261e47954361f42a8e6a0f5fa4842075c357&", offset: 10 },
+            "BARRY-350": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150857287827579/barry1.png?ex=6a099478&is=6a0842f8&hm=00cfcf3ff2da229211471212f2601a28a1c4f6072297aa2ec39c861546d56262&", offset: 0 },
+            "Bonso": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150857669382194/bonso1.png?ex=6a099478&is=6a0842f8&hm=2bdd2209d30c535c080e6e1036cc562ff15e926d15b2bbbba8cefdaf55b19ed9&", offset: 0 },
+            "Kontay": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150858126557234/dontay1.png?ex=6a099478&is=6a0842f8&hm=13d366f3ea4d5140112ea43d78a60f422825d27ac28bae17710aeac2baf1190b&", offset: 11 },
+            "Leznever": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150858554507265/leznever1.png?ex=6a099479&is=6a0842f9&hm=6fc4df3f045032a799a132fb145cb030287b96f3d06bd156652111e1d5a95dc2&", offset: -9 },
+            "Rikki": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150855073107999/rikki1.png?ex=6a099478&is=6a0842f8&hm=13cf1da80da5cdff4e5739a6cbc8bdaee26c3b78338d14aa0109f78d5049e9ae&", offset: 0 },
+            "Sin AZ": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150855551254548/sinaz1.png?ex=6a099478&is=6a0842f8&hm=6bdd1b6d79aeecf566279af8d1630a8a806f1d3cb2d34538c587686832b4587f&", offset: 25 },
+            "Spiros": { url: "https://cdn.discordapp.com/attachments/950601093073743922/1505150856172142612/spiros1.png?ex=6a099478&is=6a0842f8&hm=298f14df3e02f618d695220dddf4883e13e38d2793575a37de9bc7895f29a1a6&", offset: 0 }
+        };
+
+        const gemEnumMap = {
+            "Aegis Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150906876952667/AegisGem.png?ex=6a099484&is=6a084304&hm=1417a819bf503055b7546697b0e9cf08b6a9a8733f0a2d51ed170881a02c2150&",
+            "Blood Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150907254571121/BloodGem.png?ex=6a099484&is=6a084304&hm=4f97ed8eda65ab2297c5c2e9909fc3b940ab9475570ef9a678ca8b058a5763bc&",
+            "Cortex Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150907585790084/CortexGem.png?ex=6a099484&is=6a084304&hm=192132b8b6c98b23bb99910a70617c3b5c4fc8c0cdfdee7bad4e7777a6af8126&",
+            "Gravity Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150907934052472/GravityGem.png?ex=6a099484&is=6a084304&hm=112f5b3fce70c6dc1a81993674576bbe404700b2c464973c432f846d5ed83c7a&",
+            "Havoc Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150908349026445/HavocGem.png?ex=6a099484&is=6a084304&hm=fa8b288e8c0147f4291fdf61d1bb5258d2d77f2aef128279d6c1f27781d31125&",
+            "Stardust Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150908709998662/StardustGem.png?ex=6a099484&is=6a084304&hm=2cfc7e97bb63f9f6204fe95e9b5c366fd8b49309f5c6470f8b147b8fb5653d4a&"
+        };
+
+        const playerAutofillDatabase = [
+            { name: "Richard Nguyen", twitter: "RichardWinz" },
+            { name: "AZ", twitter: "ZaldivarPhD" },
+            { name: "metal8", twitter: "Robertc40314873" },
+            { name: "AsylumFade", twitter: "" },
+            { name: "PimbusTheWizard", twitter: "Pim_the_Wiz" },
+            { name: "Aris", twitter: "AvoidThePuddle" },
+            { name: "Mike Ross", twitter: "ThatMikeRossGuy" },
+            { name: "Justin Wong", twitter: "JWonggg" },
+            { name: "Diaphone", twitter: "Diaphone_" },
+            { name: "Masta_CJ", twitter: "MastaCJ" },
+            { name: "Sajam", twitter: "Sajam" },
+            { name: "YipeS", twitter: "IFCYipeS" },
+            { name: "Rynge", twitter: "Rynge_" },
+            { name: "jchensor", twitter: "jchensor" },
+            { name: "UltraDavid", twitter: "ultradavid" },
+            { name: "Choysauce", twitter: "Choysauce85" },
+            { name: "Newtube", twitter: "NewtubeQ" },
+            { name: "BDE | Free", twitter: "Free_FGC" },
+            { name: "NerdJosh", twitter: "NerdJosh" },
+            { name: "Epsilon Eagle", twitter: "eagle_epsilon" },
+            { name: "UV | Ace*", twitter: "AceAsterisk" },
+            { name: "AutoMattock", twitter: "AutoMattock" },
+            { name: "LPN", twitter: "LPN510" },
+            { name: "Chris Ceg", twitter: "chrisceg" },
+            { name: "PapaLobster", twitter: "PapaLobster13" },
+            { name: "Migada", twitter: "Migada767" },
+            { name: "LainySky", twitter: "LainySky" },
+            { name: "GcYoshi13", twitter: "gcyoshi13" },
+            { name: "rogueyoshi", twitter: "rogueyoshi_FGC" },
+            { name: "Arcade Divinity", twitter: "ArcadeDivinity" },
+            { name: "Swagnarok", twitter: "swagnarok" },
+            { name: "TDOmoments", twitter: "" },
+            { name: "Tatsu", twitter: "tatsunical" },
+            { name: "Alan Reyes", twitter: "_Satalan" },
+            { name: "Jint", twitter: "_Jint_" },
+            { name: "K Bui", twitter: "KingBui555" },
+            { name: "Clockw0rk", twitter: "mvcClockw0rk" },
+            { name: "OGbluesDM", twitter: "OGbluesDM" },
+            { name: "Macho", twitter: "FGCMacho" },
+            { name: "YLT Cole", twitter: "YLT_Cole" },
+            { name: "Airtola", twitter: "Airtola101" },
+            { name: "MoTempest", twitter: "EvenMoTempest" },
+            { name: "LowBlowLogan", twitter: "LowBlowLogan" }
+        ];
+
+        const slotConfigurations = [
+            { id: 1, label: "1st Place" }, { id: 2, label: "2nd Place" },
+            { id: 3, label: "3rd Place" }, { id: 4, label: "4th Place" },
+            { id: 5, label: "5th Place (A)" }, { id: 6, label: "5th Place (B)" },
+            { id: 7, label: "7th Place (A)" }, { id: 8, label: "7th Place (B)" }
+        ];
+
+        const slotsContainer = document.getElementById('slotsControlContainer');
+        const charsContainer = document.getElementById('characterConfigContainer');
+        const gemsContainer = document.getElementById('gemConfigContainer');
+
+        const charKeys = Object.keys(charEnumMap);
+        const gemKeys = Object.keys(gemEnumMap);
+
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            const title = el.previousElementSibling;
+            if (el.classList.contains('collapsed')) {
+                el.classList.remove('collapsed'); title.classList.remove('collapsed');
+            } else {
+                el.classList.add('collapsed'); title.classList.add('collapsed');
+            }
+        }
+
+        window.handleAutofill = function(inputEl, id, type) {
+            const query = inputEl.value.trim().toLowerCase();
+            const suggestionBox = document.getElementById(`suggest-${type}-${id}`);
+            suggestionBox.innerHTML = '';
+            
+            if (!query) { suggestionBox.style.display = 'none'; updateCanvas(); return; }
+            
+            const matches = playerAutofillDatabase.filter(item => 
+                type.includes('name') ? item.name.toLowerCase().includes(query) : item.twitter.toLowerCase().includes(query)
+            );
+
+            if (matches.length === 0) { suggestionBox.style.display = 'none'; updateCanvas(); return; }
+
+            suggestionBox.style.display = 'block';
+            matches.forEach(match => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerText = `${match.name} (@${match.twitter})`;
+                item.onclick = () => {
+                    if (type === 'name1') {
+                        document.getElementById(`name1-${id}`).value = match.name;
+                        document.getElementById(`tw1-${id}`).value = match.twitter;
+                    } else {
+                        document.getElementById(`name2-${id}`).value = match.name;
+                        document.getElementById(`tw2-${id}`).value = match.twitter;
+                    }
+                    suggestionBox.style.display = 'none';
+                    document.getElementById(`suggest-name1-${id}`).innerHTML = '';
+                    document.getElementById(`suggest-tw1-${id}`).innerHTML = '';
+                    document.getElementById(`suggest-name2-${id}`).innerHTML = '';
+                    document.getElementById(`suggest-tw2-${id}`).innerHTML = '';
+                    updateCanvas();
+                };
+                suggestionBox.appendChild(item);
+            });
+            updateCanvas();
+        };
+
+        function getFormattedOrdinalDate() {
+            const d = new Date();
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const day = d.getDate();
+            let suffix = "th";
+            if (day === 1 || day === 21 || day === 31) suffix = "st";
+            else if (day === 2 || day === 22) suffix = "nd";
+            else if (day === 3 || day === 23) suffix = "rd";
+            return `${months[d.getMonth()]} ${day}${suffix}, ${d.getFullYear()}`;
+        }
+
+        let characterSectionHTML = `<div class="form-section character-section">`;
+        charKeys.forEach(key => {
+            characterSectionHTML += `
+                <div style="margin-bottom:12px; border-bottom:1px solid #333; padding-bottom:8px;">
+                    <label style="font-weight:bold; color:#22c55e;">${key}</label>
+                    <div class="form-row">
+                        <div class="input-group"><label>URL</label><input type="text" id="char-url-config-${key}" value="${charEnumMap[key].url}" oninput="updateCanvas()"></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Split Offset: <span id="offset-readout-${key}" class="range-value">${charEnumMap[key].offset}px</span></label>
+                            <input type="range" id="char-offset-config-${key}" min="-50" max="50" value="${charEnumMap[key].offset}" oninput="document.getElementById('offset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                    </div>
+                </div>`;
+        });
+        characterSectionHTML += `</div>`;
+        charsContainer.innerHTML = characterSectionHTML;
+
+        let gemSectionHTML = `<div class="form-section gem-section">`;
+        gemKeys.forEach(key => {
+            gemSectionHTML += `
+                <div style="margin-bottom:12px; border-bottom:1px solid #333; padding-bottom:8px;">
+                    <label style="font-weight:bold; color:#3b82f6; display:block; margin-bottom:4px;">${key}</label>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label style="color:#aaa;">URL</label>
+                            <input type="text" id="gem-url-config-${key}" value="${gemEnumMap[key]}" oninput="updateCanvas()">
+                        </div>
+                    </div>
+                </div>`;
+        });
+        gemSectionHTML += `</div>`;
+        gemsContainer.innerHTML = gemSectionHTML;
+
+        function getMapKeyInsensitive(object, keyString) {
+            const normalizedKey = keyString.trim().toLowerCase();
+            return Object.keys(object).find(k => k.toLowerCase() === normalizedKey) || "";
+        }
+
+        const randomCount = Math.floor(Math.random() * 3) + 2; 
+        const chosenNoneSlots = [];
+        while (chosenNoneSlots.length < randomCount) {
+            const potentialId = Math.floor(Math.random() * 8) + 1;
+            if (!chosenNoneSlots.includes(potentialId)) {
+                chosenNoneSlots.push(potentialId);
+            }
+        }
+
+        window.clearParticipantSlot = function(id) {
+            document.getElementById(`name1-${id}`).value = '';
+            document.getElementById(`tw1-${id}`).value = '';
+            document.getElementById(`name2-${id}`).value = '';
+            document.getElementById(`tw2-${id}`).value = '';
+            document.getElementById(`c1-${id}`).value = '';
+            document.getElementById(`c2-${id}`).value = '';
+            document.getElementById(`gem-${id}`).value = '';
+            updateCanvas();
+        };
+
+        slotConfigurations.forEach(slot => {
+            const randomChar1 = charKeys[Math.floor(Math.random() * charKeys.length)];
+            const randomChar2 = charKeys[Math.floor(Math.random() * charKeys.length)];
+            const randomGem = gemKeys[Math.floor(Math.random() * gemKeys.length)];
+
+            const forceSecondaryNone = chosenNoneSlots.includes(slot.id);
+
+            let char1Options = `<option value="">None</option>` + charKeys.map(k => `<option value="${k}" ${k.toLowerCase() === randomChar1.toLowerCase() ? 'selected' : ''}>${k}</option>`).join('');
+            let char2Options = `<option value="">None</option>` + charKeys.map(k => `<option value="${k}" ${(k.toLowerCase() === randomChar2.toLowerCase() && !forceSecondaryNone) ? 'selected' : ''}>${k}</option>`).join('');
+            let gemOptions = `<option value="">None</option>` + gemKeys.map(k => `<option value="${k}" ${k === randomGem ? 'selected' : ''}>${k}</option>`).join('');
+
+            slotsContainer.innerHTML += `
+                <div class="form-section roster-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <h3>${slot.label} Settings</h3>
+                        <button class="clear-slot-btn" onclick="clearParticipantSlot(${slot.id})">Clear Slot</button>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>1st Name</label>
+                            <input type="text" id="name1-${slot.id}" value="Player ${slot.id}" placeholder="Player" oninput="handleAutofill(this, ${slot.id}, 'name1')" autocomplete="off">
+                            <div id="suggest-name1-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>1st Handle</label>
+                            <input type="text" id="tw1-${slot.id}" placeholder="1st Handle" oninput="handleAutofill(this, ${slot.id}, 'tw1')" autocomplete="off">
+                            <div id="suggest-tw1-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>2nd Name</label>
+                            <input type="text" id="name2-${slot.id}" placeholder="2nd Name" oninput="handleAutofill(this, ${slot.id}, 'name2')" autocomplete="off">
+                            <div id="suggest-name2-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
+                        </div>
+                        <div class="input-group">
+                            <label>2nd Handle</label>
+                            <input type="text" id="tw2-${slot.id}" placeholder="2nd Handle" oninput="handleAutofill(this, ${slot.id}, 'tw2')" autocomplete="off">
+                            <div id="suggest-tw2-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group"><label>Primary Fighter</label><select id="c1-${slot.id}" onchange="updateCanvas()">${char1Options}</select></div>
+                        <div class="input-group"><label>Secondary</label><select id="c2-${slot.id}" onchange="updateCanvas()">${char2Options}</select></div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group"><label>Equipped Gem</label><select id="gem-${slot.id}" onchange="updateCanvas()">${gemOptions}</select></div>
+                    </div>
+                </div>`;
+        });
+
+        function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction) {
+            if (!textString) return { html: '', isReduced: false };
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            let targetSize = baseFontSize;
+            ctx.font = isHandle ? `bold ${targetSize}px sans-serif` : `bold ${targetSize}px "Arial Black"`;
+            
+            let wasReduced = false;
+            
+            if (!isHandle) {
+                if (ctx.measureText(textString).width > maxWidth) {
+                    targetSize = Math.round(baseFontSize * 0.50);
+                    ctx.font = `bold ${targetSize}px "Arial Black"`;
+                    wasReduced = true;
+                }
+            } else {
+                if (forceHandleReduction || ctx.measureText(textString).width > maxWidth) {
+                    targetSize = Math.round(baseFontSize * 0.75);
+                    ctx.font = `bold ${targetSize}px sans-serif`;
+                    wasReduced = true;
+                }
+            }
+            
+            let finalOutputString = textString;
+            if (ctx.measureText(finalOutputString).width > maxWidth) {
+                while (ctx.measureText(finalOutputString + '...').width > maxWidth && finalOutputString.length > 0) {
+                    finalOutputString = finalOutputString.slice(0, -1);
+                }
+                finalOutputString += '...';
+            }
+            
+            const styleClass = isHandle ? 'twitter-handle' : 'player-name';
+            const htmlResult = `<div class="${styleClass}" style="font-size: ${targetSize}px;">${finalOutputString}</div>`;
+            return { html: htmlResult, isReduced: wasReduced };
+        }
+
+        // Restores 3-line word wrapping engine tracking letter-spacing
+        function getFitCornerTextHTML(textString, baseFontSize, maxWidth) {
+            if (!textString) return '';
+            
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.font = `bold ${baseFontSize}px "Arial Black", sans-serif`;
+            
+            function measureWidth(text) {
+                if (!text) return 0;
+                return ctx.measureText(text).width + (text.length * 1);
+            }
+            
+            if (measureWidth(textString) <= maxWidth) {
+                return textString;
+            }
+            
+            const words = textString.split(/(\s+)/).filter(token => token.length > 0);
+            let lines = [];
+            let currentLine = '';
+            
+            for (let i = 0; i < words.length; i++) {
+                let testLine = currentLine + words[i];
+                if (measureWidth(testLine.trim()) > maxWidth && currentLine.trim() !== '') {
+                    lines.push(currentLine.trim());
+                    currentLine = words[i];
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine.trim() !== '') {
+                lines.push(currentLine.trim());
+            }
+            
+            if (lines.length > 3) {
+                lines = lines.slice(0, 3);
+                let truncatedLast = lines[2];
+                while (measureWidth(truncatedLast + '...') > maxWidth && truncatedLast.length > 0) {
+                    truncatedLast = truncatedLast.slice(0, -1);
+                }
+                lines[2] = truncatedLast + '...';
+            } else {
+                for (let k = 0; k < lines.length; k++) {
+                    if (measureWidth(lines[k]) > maxWidth) {
+                        let singleLine = lines[k];
+                        while (measureWidth(singleLine + '...') > maxWidth && singleLine.length > 0) {
+                            singleLine = singleLine.slice(0, -1);
+                        }
+                        lines[k] = singleLine + '...';
+                    }
+                }
+            }
+            
+            return lines.join('<br>');
+        }
+
+        function getTransparentColor(hex) {
+            let r = 0, g = 0, b = 0;
+            if (hex.startsWith('#')) hex = hex.slice(1);
+            if (hex.length === 3) {
+                r = parseInt(hex[0]+hex[0], 16);
+                g = parseInt(hex[1]+hex[1], 16);
+                b = parseInt(hex[2]+hex[2], 16);
+            } else if (hex.length === 6) {
+                r = parseInt(hex.substring(0,2), 16);
+                g = parseInt(hex.substring(2,4), 16);
+                b = parseInt(hex.substring(4,6), 16);
+            }
+            return `rgba(${r}, ${g}, ${b}, 0)`;
+        }
+
+        function updateCanvas() {
+            const canvasTarget = document.getElementById('canvasTarget');
+            const matrixGridTarget = document.getElementById('matrixGridTarget');
+            if(!canvasTarget || !matrixGridTarget) return; 
+            
+            const bgVal = document.getElementById('bgInput').value;
+            canvasTarget.style.backgroundImage = bgVal ? `url('${bgVal}')` : 'none';
+
+            const primaryColor = document.getElementById('primaryColorInput').value;
+            const secondaryColor = document.getElementById('secondaryColorInput').value;
+            const baseBorderThickness = parseInt(document.getElementById('borderThicknessInput').value);
+            const baseGemScale = parseInt(document.getElementById('gemScaleInput').value);
+            const gemPaddingOffset = parseInt(document.getElementById('gemPaddingInput').value);
+            const canvasVPadding = document.getElementById('vPaddingInput').value;
+            const horizontalScale = parseInt(document.getElementById('hScaleInput').value);
+
+            const cornerTriangleWidthMultiplier = parseInt(document.getElementById('cWidthScaleInput').value) / 100;
+            const cornerTriangleHeightMultiplier = parseInt(document.getElementById('cHeightScaleInput').value) / 100;
+
+            const placingNumBaseSize = parseInt(document.getElementById('pSizeInput').value);
+            const cornerTextPadding = document.getElementById('cPadInput').value;
+            const playerNameSize = parseInt(document.getElementById('nSizeInput').value);
+            const twitterNameSize = parseInt(document.getElementById('tSizeInput').value);
+            const nameTwitterGap = parseInt(document.getElementById('ntGapInput').value);
+            const twitterBottomPadding = parseInt(document.getElementById('tBotPadInput').value);
+            const bannerMaxHeight = document.getElementById('bHeightInput').value;
+            const bannerSlantAngle = parseInt(document.getElementById('slantInput').value);
+
+            const cornerMaxTextWidthTop = parseInt(document.getElementById('cMaxWidthTopInput').value);
+            const cornerMaxTextWidthBottom = parseInt(document.getElementById('cMaxWidthBottomInput').value);
+
+            const sizeTL = document.getElementById('tlSizeInput').value;
+            const sizeTR = document.getElementById('trSizeInput').value;
+            const sizeBL = document.getElementById('blSizeInput').value;
+            const sizeBR = document.getElementById('brSizeInput').value;
+
+            const layoutScaleFactor24 = parseInt(document.getElementById('scale24Input').value) / 100;
+            const layoutScaleFactor58 = parseInt(document.getElementById('scale58Input').value) / 100;
+
+            const divWeights = {
+                w1: parseInt(document.getElementById('w1Input').value), b1: parseInt(document.getElementById('b1Input').value),
+                w2: parseInt(document.getElementById('w2Input').value), b2: parseInt(document.getElementById('b2Input').value),
+                w3: parseInt(document.getElementById('w3Input').value), b3: parseInt(document.getElementById('b3Input').value)
+            };
+
+            const innerB1 = parseInt(document.getElementById('gb1Input').value);
+            const middleW1 = parseInt(document.getElementById('gw1Input').value);
+            const innerBRest = parseInt(document.getElementById('gbrInput').value);
+            const middleWRest = parseInt(document.getElementById('gwrInput').value);
+
+            const forceOpaqueBlack = document.getElementById('opaqueBgCheckbox').checked;
+
+            document.getElementById('borderValueDisplay').innerText = baseBorderThickness + "px";
+            document.getElementById('hScaleValueDisplay').innerText = horizontalScale + "%";
+            document.getElementById('cWidthScaleValueDisplay').innerText = document.getElementById('cWidthScaleInput').value + "%";
+            document.getElementById('cHeightScaleValueDisplay').innerText = document.getElementById('cHeightScaleInput').value + "%";
+            document.getElementById('scale24ValueDisplay').innerText = document.getElementById('scale24Input').value + "%";
+            document.getElementById('scale58ValueDisplay').innerText = document.getElementById('scale58Input').value + "%";
+            document.getElementById('gemScaleValueDisplay').innerText = baseGemScale + "px";
+            document.getElementById('gemPaddingValueDisplay').innerText = gemPaddingOffset + "px";
+            document.getElementById('vPaddingValueDisplay').innerText = canvasVPadding + "px";
+            document.getElementById('w1Val').innerText = divWeights.w1 + "px"; document.getElementById('b1Val').innerText = divWeights.b1 + "px";
+            document.getElementById('w2Val').innerText = divWeights.w2 + "px"; document.getElementById('b2Val').innerText = divWeights.b2 + "px";
+            document.getElementById('w3Val').innerText = divWeights.w3 + "px"; document.getElementById('b3Val').innerText = divWeights.b3 + "px";
+            document.getElementById('pSizeVal').innerText = placingNumBaseSize + "px";
+            document.getElementById('cPadVal').innerText = cornerTextPadding + "px";
+            
+            document.getElementById('cMaxWidthTopVal').innerText = cornerMaxTextWidthTop + "px";
+            document.getElementById('cMaxWidthBottomVal').innerText = cornerMaxTextWidthBottom + "px";
+            
+            document.getElementById('tlSizeVal').innerText = sizeTL + "px";
+            document.getElementById('trSizeVal').innerText = sizeTR + "px";
+            document.getElementById('blSizeVal').innerText = sizeBL + "px";
+            document.getElementById('brSizeVal').innerText = sizeBR + "px";
+            
+            document.getElementById('nSizeVal').innerText = playerNameSize + "px";
+            document.getElementById('tSizeVal').innerText = twitterNameSize + "px";
+            document.getElementById('ntGapVal').innerText = nameTwitterGap + "px";
+            document.getElementById('bHeightVal').innerText = bannerMaxHeight + "%";
+            document.getElementById('slantVal').innerText = bannerSlantAngle + "px";
+            document.getElementById('gw1Val').innerText = middleW1 + "px"; document.getElementById('gb1Val').innerText = innerB1 + "px";
+            document.getElementById('gwrVal').innerText = middleWRest + "px"; document.getElementById('gbrVal').innerText = innerBRest + "px";
+
+            canvasTarget.style.setProperty('--canvas-secondary-color', secondaryColor);
+            canvasTarget.style.paddingTop = canvasVPadding + "px";
+            canvasTarget.style.paddingBottom = canvasVPadding + "px";
+
+            canvasTarget.style.setProperty('--triangle-width', Math.round(184 * cornerTriangleWidthMultiplier) + "px");
+            canvasTarget.style.setProperty('--triangle-height', Math.round(79 * cornerTriangleHeightMultiplier) + "px");
+            
+            canvasTarget.style.setProperty('--corner-max-width-top', cornerMaxTextWidthTop + "px");
+            canvasTarget.style.setProperty('--corner-max-width-bottom', cornerMaxTextWidthBottom + "px");
+            
+            matrixGridTarget.style.transform = `scale(${horizontalScale / 100})`;
+
+            const textPlacements = ['tl', 'tr', 'bl', 'br'];
+            textPlacements.forEach(pos => {
+                const textInput = document.getElementById(`${pos}Input`).value;
+                const targetNode = document.getElementById(`text${pos.toUpperCase()}`);
+                targetNode.style.display = textInput ? 'block' : 'none';
+                
+                if(pos === 'tl') { 
+                    targetNode.innerHTML = getFitCornerTextHTML(textInput, sizeTL, cornerMaxTextWidthTop);
+                    targetNode.style.fontSize = sizeTL + "px"; targetNode.style.top = cornerTextPadding + "px"; targetNode.style.left = cornerTextPadding + "px"; 
+                }
+                if(pos === 'tr') { 
+                    targetNode.innerHTML = getFitCornerTextHTML(textInput, sizeTR, cornerMaxTextWidthTop);
+                    targetNode.style.fontSize = sizeTR + "px"; targetNode.style.top = cornerTextPadding + "px"; targetNode.style.right = cornerTextPadding + "px"; 
+                }
+                if(pos === 'bl') { 
+                    targetNode.innerHTML = getFitCornerTextHTML(textInput, sizeBL, cornerMaxTextWidthBottom);
+                    targetNode.style.fontSize = sizeBL + "px"; targetNode.style.bottom = cornerTextPadding + "px"; targetNode.style.left = cornerTextPadding + "px"; 
+                }
+                if(pos === 'br') { 
+                    targetNode.innerHTML = getFitCornerTextHTML(textInput, sizeBR, cornerMaxTextWidthBottom);
+                    targetNode.style.fontSize = sizeBR + "px"; targetNode.style.bottom = cornerTextPadding + "px"; targetNode.style.right = cornerTextPadding + "px"; 
+                }
+            });
+
+            for (let i = 1; i <= 8; i++) {
+                const name1 = document.getElementById(`name1-${i}`).value;
+                let tw1 = document.getElementById(`tw1-${i}`).value.trim();
+                if (tw1 && !tw1.startsWith('@')) tw1 = '@' + tw1;
+
+                const name2 = document.getElementById(`name2-${i}`).value;
+                let tw2 = document.getElementById(`tw2-${i}`).value.trim();
+                if (tw2 && !tw2.startsWith('@')) tw2 = '@' + tw2;
+
+                const char1Key = document.getElementById(`c1-${i}`).value;
+                const char2Key = document.getElementById(`c2-${i}`).value;
+                const gemKey = document.getElementById(`gem-${i}`).value;
+
+                const frameNode = document.getElementById(`frame-${i}`);
+                const imgContainer = document.getElementById(`img-container-${i}`);
+                const metaContainer = document.getElementById(`meta-${i}`);
+                const textOverlayContainer = document.getElementById(`overlay-${i}`);
+                const rankNode = document.getElementById(`rank-${i}`);
+
+                if (!name1 && !tw1 && !name2 && !tw2 && !char1Key && !char2Key && !gemKey) {
+                    frameNode.classList.add('hidden-empty');
+                    continue;
+                }
+                frameNode.classList.remove('hidden-empty');
+
+                let scalar = 1.0;
+                if (i >= 2 && i <= 4) scalar = layoutScaleFactor24;
+                else if (i >= 5) scalar = layoutScaleFactor58;
+
+                const widthBound = (i === 1) ? 310 : (i <= 4 ? 185 : 133);
+                const availableTextWidth = widthBound - 16; 
+
+                const structuralTierScalar = (i === 1) ? 1.0 : (i <= 4 ? 0.75 : 0.55);
+                const scaledBorder = Math.max(2, Math.round(baseBorderThickness * structuralTierScalar));
+                const scaledGemSize = Math.max(14, Math.round(baseGemScale * structuralTierScalar));
+                const scaledRankFont = Math.round(placingNumBaseSize * structuralTierScalar);
+                
+                const scaledNameFont = Math.round(playerNameSize * scalar);
+                const scaledTwitterFont = Math.round(twitterNameSize * scalar);
+                
+                const maxBannerHeightInPx = Math.round(170 * structuralTierScalar * (parseInt(bannerMaxHeight) / 100));
+                const scaledTwitterPadding = Math.round(twitterBottomPadding * structuralTierScalar);
+                const scaledSlantAngle = Math.round(bannerSlantAngle * structuralTierScalar);
+                const scaledNameTwitterGap = Math.round(nameTwitterGap * structuralTierScalar);
+
+                frameNode.style.borderColor = primaryColor;
+                frameNode.style.borderWidth = `${scaledBorder}px`;
+                frameNode.style.backgroundColor = forceOpaqueBlack ? "#000000" : "transparent";
+
+                const leftOffset = scaledSlantAngle < 0 ? Math.abs(scaledSlantAngle) : 0;
+                const rightOffset = scaledSlantAngle > 0 ? scaledSlantAngle : 0;
+                
+                // Gap overlay seal Fix: Expand frame background layer height +1px to organically overlap outer CSS borders
+                metaContainer.style.height = (maxBannerHeightInPx + 1) + "px";
+                
+                // Pure rgba transition removes anti-aliasing bleeds inside html2canvas grid captures
+                const transColor = getTransparentColor(primaryColor);
+
+                if (scaledSlantAngle === 0) {
+                    metaContainer.style.background = primaryColor;
+                } else if (scaledSlantAngle < 0) {
+                    const anglePct = (leftOffset / maxBannerHeightInPx) * 100;
+                    metaContainer.style.background = `linear-gradient(to bottom right, ${transColor} ${anglePct}%, ${primaryColor} ${anglePct}%)`;
+                } else {
+                    const anglePct = (rightOffset / maxBannerHeightInPx) * 100;
+                    metaContainer.style.background = `linear-gradient(to bottom left, ${transColor} ${anglePct}%, ${primaryColor} ${anglePct}%)`;
+                }
+
+                textOverlayContainer.style.height = `${(170 * structuralTierScalar) - scaledBorder}px`;
+                textOverlayContainer.style.paddingBottom = `${scaledTwitterPadding}px`;
+
+                rankNode.style.fontSize = scaledRankFont + "px";
+                rankNode.style.top = "-" + Math.round(5 * structuralTierScalar) + "px";
+                rankNode.style.left = Math.round(12 * structuralTierScalar) + "px";
+
+                const validChar1Key = getMapKeyInsensitive(charEnumMap, char1Key);
+                const validChar2Key = getMapKeyInsensitive(charEnumMap, char2Key);
+                const validGemKey = getMapKeyInsensitive(gemEnumMap, gemKey);
+
+                const char1URL = validChar1Key ? charEnumMap[validChar1Key].url : "";
+                const char2URL = validChar2Key ? charEnumMap[validChar2Key].url : "";
+                const char1Offset = validChar1Key ? parseInt(charEnumMap[validChar1Key].offset) : 0;
+                const char2Offset = validChar2Key ? parseInt(charEnumMap[validChar2Key].offset) : 0;
+                const currentGemURL = validGemKey ? gemEnumMap[validGemKey] : "";
+
+                let bW = divWeights.b3, wW = divWeights.w3;
+                if (i === 1) { bW = divWeights.b1; wW = divWeights.w1; }
+                else if (i >= 2 && i <= 4) { bW = divWeights.b2; wW = divWeights.w2; }
+
+                let imageHTML = '';
+                if (char1URL && char2URL) {
+                    imageHTML = `
+                        <div class="pane-split-container">
+                            <div class="pane-half"><img src="${char1URL}" crossorigin="anonymous" style="left: calc(-50% + ${char1Offset}px);"></div>
+                            <div class="pane-divider-group" style="width: ${bW * 2 + wW}px;">
+                                <div class="pane-divider-black-l" style="width: ${bW}px;"></div>
+                                <div class="pane-divider-white" style="width: ${wW}px;"></div>
+                                <div class="pane-divider-black-r" style="width: ${bW}px;"></div>
+                            </div>
+                            <div class="pane-half"><img src="${char2URL}" crossorigin="anonymous" style="left: calc(-50% + ${char2Offset}px);"></div>
+                        </div>`;
+                } else if (char1URL || char2URL) {
+                    imageHTML = `<img class="char-full" src="${char1URL || char2URL}" crossorigin="anonymous">`;
+                }
+                
+                if (currentGemURL) {
+                    const gemPos = gemPaddingOffset - 2;
+                    let innerB, middleW;
+                    
+                    if (i === 1) {
+                        innerB = innerB1;
+                        middleW = middleW1;
+                    } else {
+                        innerB = innerBRest;
+                        middleW = middleWRest;
+                    }
+
+                    imageHTML += `
+                        <div class="gem-box" style="
+                            background-image: url('${currentGemURL}'); 
+                            width: ${scaledGemSize}px; height: ${scaledGemSize}px; 
+                            top: ${gemPos}px; right: ${gemPos}px;
+                            box-shadow: 0 0 0 ${innerB}px #000, 0 0 0 ${innerB + middleW}px #fff, 0 0 0 ${innerB + middleW + innerB}px #000;
+                            border: none; margin: ${innerB + middleW + innerB}px;
+                        "></div>`;
+                }
+                imgContainer.innerHTML = imageHTML;
+
+                if (name1 || tw1 || name2 || tw2) {
+                    metaContainer.style.display = 'block';
+                    textOverlayContainer.style.display = 'flex';
+                    
+                    const resName1 = getFitTextHTML(name1, scaledNameFont, availableTextWidth, false, false);
+                    const resTw1 = getFitTextHTML(tw1, scaledTwitterFont, availableTextWidth, true, resName1.isReduced);
+                    
+                    const resName2 = getFitTextHTML(name2, scaledNameFont, availableTextWidth, false, false);
+                    const resTw2 = getFitTextHTML(tw2, scaledTwitterFont, availableTextWidth, true, resName2.isReduced);
+                    
+                    let completeLayoutHTML = '';
+                    
+                    if (name1) completeLayoutHTML += resName1.html;
+                    if (tw1) {
+                        if (name1) completeLayoutHTML += `<div style="height: ${scaledNameTwitterGap}px; width: 100%;"></div>`;
+                        completeLayoutHTML += resTw1.html;
+                    }
+                    if (name2) {
+                        if (name1 || tw1) completeLayoutHTML += `<div style="height: ${Math.max(2, Math.round(4 * structuralTierScalar))}px; width: 100%;"></div>`;
+                        completeLayoutHTML += resName2.html;
+                    }
+                    if (tw2) {
+                        if (name2) completeLayoutHTML += `<div style="height: ${scaledNameTwitterGap}px; width: 100%;"></div>`;
+                        else if (name1 || tw1) completeLayoutHTML += `<div style="height: ${Math.max(2, Math.round(4 * structuralTierScalar))}px; width: 100%;"></div>`;
+                        completeLayoutHTML += resTw2.html;
+                    }
+                    
+                    textOverlayContainer.innerHTML = completeLayoutHTML;
+                } else {
+                    metaContainer.style.display = 'none';
+                    textOverlayContainer.style.display = 'none';
+                    textOverlayContainer.innerHTML = '';
+                }
+            }
+        }
+
+        function exportFinishedPNG() {
+            const canvasTarget = document.getElementById('canvasTarget');
+            
+            const dateObj = new Date();
+            const dateString = `${dateObj.getFullYear()}${String(dateObj.getMonth() + 1).padStart(2, '0')}${String(dateObj.getDate()).padStart(2, '0')}`;
+
+            const rawTournamentName = document.getElementById('tlInput').value.trim();
+            const safeFileName = rawTournamentName ? `${rawTournamentName}_GemionFunction_${dateString}` : `GemionFunction_${dateString}`;
+
+            const renderContainer = document.createElement('div');
+            renderContainer.style.position = 'absolute';
+            renderContainer.style.top = '-9999px'; renderContainer.style.left = '-9999px';
+            renderContainer.style.width = '960px'; renderContainer.style.height = '540px';
+            renderContainer.style.overflow = 'hidden';
+            document.body.appendChild(renderContainer);
+
+            const canvasClone = canvasTarget.cloneNode(true);
+            canvasClone.style.transform = 'none';
+            canvasClone.style.left = '0'; canvasClone.style.top = '0'; canvasClone.style.margin = '0';
+            
+            const innerGrid = canvasClone.querySelector('#matrixGridTarget');
+            const currentScale = document.getElementById('hScaleInput').value;
+            innerGrid.style.transform = `scale(${currentScale / 100})`;
+            
+            renderContainer.appendChild(canvasClone);
+
+            html2canvas(canvasClone, {
+                useCORS: true,
+                allowTaint: true,
+                scale: 2, 
+                width: 960, height: 540,
+                backgroundColor: null,
+                logging: false
+            }).then(canvas => {
+                const imageURI = canvas.toDataURL("image/png");
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.href = imageURI;
+                downloadAnchor.download = `${safeFileName}.png`;
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                document.body.removeChild(downloadAnchor);
+                document.body.removeChild(renderContainer);
+            }).catch(err => {
+                console.error("PNG Sandbox Capture Error: ", err);
+                if(renderContainer.parentNode) { document.body.removeChild(renderContainer); }
+                alert("PNG capture encountered a system error during sandbox rendering.");
+            });
+        }
+
+        window.addEventListener('load', () => {
+            document.getElementById('trInput').value = getFormattedOrdinalDate();
+            updateCanvas();
+        });
+    </script>
+</body>
+</html>
