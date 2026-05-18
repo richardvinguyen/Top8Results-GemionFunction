@@ -122,7 +122,7 @@
 
         .corner-text { 
             position: absolute; font-family: 'Arial Black', sans-serif; letter-spacing: 1px; z-index: 20; 
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            text-shadow: var(--corner-outline, none);
             white-space: normal; word-wrap: break-word; overflow-wrap: break-word; line-height: 1.1;
         }
         .tl-text, .tr-text { max-width: var(--corner-max-width-top, 230px); }
@@ -182,14 +182,12 @@
 
         .player-name { 
             font-weight: bold; color: #fff; 
-            text-shadow: 0px 0px 6px #000000, 0px 0px 6px #000000, 0px 0px 6px #000000;
             display: inline-block; width: 100%; text-align: center;
             transform: scaleY(1.3); transform-origin: bottom;
             white-space: nowrap; 
         }
         .twitter-handle { 
             font-family: sans-serif; font-weight: bold; color: #fff;
-            text-shadow: 1px 1px 3px #000, -1px -1px 3px #000, 1px -1px 3px #000, -1px 1px 3px #000;
             width: 100%; text-align: center; display: block;
             white-space: nowrap; 
         }
@@ -243,6 +241,13 @@
         <div id="layoutContent" class="collapsible-content collapsed">
             <div class="form-section layout-config-section">
                 <div class="form-row">
+                    <div class="input-group">
+                        <label>Split Type</label>
+                        <select id="splitTypeInput" onchange="updateCanvas()">
+                            <option value="diagonal" selected>Diagonal Split</option>
+                            <option value="vertical">Vertical Split</option>
+                        </select>
+                    </div>
                     <div class="input-group">
                         <label>Canvas Background Image</label>
                         <select id="bgInput" onchange="updateCanvas()"></select>
@@ -362,6 +367,13 @@
                     <div class="input-group"><label>Twitter Bottom Padding <span id="tBotPadVal" class="range-value">5px</span></label><input type="range" id="tBotPadInput" min="0" max="24" value="5" oninput="updateCanvas()"></div>
                 </div>
 
+                <h3 style="margin-top: 15px;">Text Outlines</h3>
+                <div class="form-row">
+                    <div class="input-group"><label>Corner Outline <span id="cOutlineVal" class="range-value">2px</span></label><input type="range" id="cOutlineInput" min="0" max="8" value="2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Name Outline <span id="nOutlineVal" class="range-value">4px</span></label><input type="range" id="nOutlineInput" min="0" max="10" value="4" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Twitter Outline <span id="tOutlineVal" class="range-value">3px</span></label><input type="range" id="tOutlineInput" min="0" max="8" value="3" oninput="updateCanvas()"></div>
+                </div>
+
                 <h3 style="margin-top: 15px;">Player Banner Box</h3>
                 <div class="form-row">
                     <div class="input-group"><label>Banner Max H% <span id="bHeightVal" class="range-value">35%</span></label><input type="range" id="bHeightInput" min="10" max="50" value="35" oninput="updateCanvas()"></div>
@@ -479,7 +491,7 @@
                 item.className = 'suggestion-item';
                 item.innerText = `${match.name} (@${match.twitter})`;
                 item.onclick = () => {
-                    if (type === 'name1') {
+                    if (type === 'name1' || type === 'tw1') {
                         document.getElementById(`name1-${id}`).value = match.name;
                         document.getElementById(`tw1-${id}`).value = match.twitter;
                     } else {
@@ -519,8 +531,36 @@
                     </div>
                     <div class="form-row">
                         <div class="input-group">
-                            <label>Split Offset: <span id="offset-readout-${key}" class="range-value">${charEnumMap[key].offset}px</span></label>
-                            <input type="range" id="char-offset-config-${key}" min="-50" max="50" value="${charEnumMap[key].offset}" oninput="document.getElementById('offset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                            <label>Horizontal Split Offset: <span id="h-offset-readout-${key}" class="range-value">${charEnumMap[key].hOffset}px</span></label>
+                            <input type="range" id="char-h-offset-config-${key}" min="-50" max="50" value="${charEnumMap[key].hOffset}" oninput="document.getElementById('h-offset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Diag TL X-Offset: <span id="tl-xoffset-readout-${key}" class="range-value">${charEnumMap[key].tlXOffset || 0}px</span></label>
+                            <input type="range" id="char-tl-xoffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].tlXOffset || 0}" oninput="document.getElementById('tl-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                        <div class="input-group">
+                            <label>Diag TL Y-Offset: <span id="tl-voffset-readout-${key}" class="range-value">${charEnumMap[key].tlVOffset || 0}px</span></label>
+                            <input type="range" id="char-tl-voffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].tlVOffset || 0}" oninput="document.getElementById('tl-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                        <div class="input-group">
+                            <label>Diag TL Zoom %: <span id="tl-zoom-readout-${key}" class="range-value">${charEnumMap[key].tlZoom !== undefined ? charEnumMap[key].tlZoom : 100}%</span></label>
+                            <input type="range" id="char-tl-zoom-config-${key}" min="75" max="200" value="${charEnumMap[key].tlZoom !== undefined ? charEnumMap[key].tlZoom : 100}" oninput="document.getElementById('tl-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Diag BR X-Offset: <span id="br-xoffset-readout-${key}" class="range-value">${charEnumMap[key].brXOffset || 0}px</span></label>
+                            <input type="range" id="char-br-xoffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].brXOffset || 0}" oninput="document.getElementById('br-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                        <div class="input-group">
+                            <label>Diag BR Y-Offset: <span id="br-voffset-readout-${key}" class="range-value">${charEnumMap[key].brVOffset || 0}px</span></label>
+                            <input type="range" id="char-br-voffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].brVOffset || 0}" oninput="document.getElementById('br-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                        </div>
+                        <div class="input-group">
+                            <label>Diag BR Zoom %: <span id="br-zoom-readout-${key}" class="range-value">${charEnumMap[key].brZoom !== undefined ? charEnumMap[key].brZoom : 100}%</span></label>
+                            <input type="range" id="char-br-zoom-config-${key}" min="75" max="200" value="${charEnumMap[key].brZoom !== undefined ? charEnumMap[key].brZoom : 100}" oninput="document.getElementById('br-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
                         </div>
                     </div>
                 </div>`;
@@ -589,20 +629,20 @@
                     <div class="form-row">
                         <div class="input-group">
                             <label>1st Name</label>
-                            <input type="text" id="name1-${slot.id}" value="Player ${slot.id}" placeholder="Player" oninput="handleAutofill(this, ${slot.id}, 'name1')" autocomplete="off">
+                            <input type="text" id="name1-${slot.id}" value="" placeholder="Player ${slot.id}" oninput="handleAutofill(this, ${slot.id}, 'name1')" autocomplete="off">
                             <div id="suggest-name1-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
                         </div>
-                        <div class="input-group">
-                            <label>1st Handle</label>
-                            <input type="text" id="tw1-${slot.id}" placeholder="1st Handle" oninput="handleAutofill(this, ${slot.id}, 'tw1')" autocomplete="off">
-                            <div id="suggest-tw1-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
-                        </div>
-                    </div>
-                    <div class="form-row">
                         <div class="input-group">
                             <label>2nd Name</label>
                             <input type="text" id="name2-${slot.id}" placeholder="2nd Name" oninput="handleAutofill(this, ${slot.id}, 'name2')" autocomplete="off">
                             <div id="suggest-name2-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>1st Handle</label>
+                            <input type="text" id="tw1-${slot.id}" placeholder="1st Handle" oninput="handleAutofill(this, ${slot.id}, 'tw1')" autocomplete="off">
+                            <div id="suggest-tw1-${slot.id}" class="autocomplete-suggestions" style="display:none;"></div>
                         </div>
                         <div class="input-group">
                             <label>2nd Handle</label>
@@ -611,16 +651,16 @@
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="input-group"><label>Primary Fighter</label><select id="c1-${slot.id}" onchange="updateCanvas()">${char1Options}</select></div>
-                        <div class="input-group"><label>Secondary</label><select id="c2-${slot.id}" onchange="updateCanvas()">${char2Options}</select></div>
+                        <div class="input-group"><label>1st Character</label><select id="c1-${slot.id}" onchange="updateCanvas()">${char1Options}</select></div>
+                        <div class="input-group"><label>2nd Character</label><select id="c2-${slot.id}" onchange="updateCanvas()">${char2Options}</select></div>
                     </div>
                     <div class="form-row">
-                        <div class="input-group"><label>Equipped Gem</label><select id="gem-${slot.id}" onchange="updateCanvas()">${gemOptions}</select></div>
+                        <div class="input-group"><label>Gem</label><select id="gem-${slot.id}" onchange="updateCanvas()">${gemOptions}</select></div>
                     </div>
                 </div>`;
         });
 
-        function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction, shrinkScale) {
+        function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction, shrinkScale, baseOutlineSize) {
             if (!textString) return { html: '', isReduced: false };
             
             const canvas = document.createElement('canvas');
@@ -654,8 +694,16 @@
                 finalOutputString += '...';
             }
             
+            // Mathematically scale the outline down proportionally if the text was shrunk
+            let finalScaleRatio = targetSize / baseFontSize;
+            let currentOutline = Math.round(baseOutlineSize * finalScaleRatio);
+            
+            let outlineShadow = currentOutline > 0 
+                ? `${currentOutline}px ${currentOutline}px 0 #000, -${currentOutline}px -${currentOutline}px 0 #000, ${currentOutline}px -${currentOutline}px 0 #000, -${currentOutline}px ${currentOutline}px 0 #000, 0px ${currentOutline}px 0 #000, 0px -${currentOutline}px 0 #000, ${currentOutline}px 0px 0 #000, -${currentOutline}px 0px 0 #000` 
+                : 'none';
+            
             const styleClass = isHandle ? 'twitter-handle' : 'player-name';
-            const htmlResult = `<div class="${styleClass}" style="font-size: ${targetSize}px;">${finalOutputString}</div>`;
+            const htmlResult = `<div class="${styleClass}" style="font-size: ${targetSize}px; text-shadow: ${outlineShadow};">${finalOutputString}</div>`;
             return { html: htmlResult, isReduced: wasReduced };
         }
 
@@ -732,6 +780,7 @@
 
         function updateCanvas() {
             const canvasTarget = document.getElementById('canvasTarget');
+            const splitType = document.getElementById('splitTypeInput').value;
             const matrixGridTarget = document.getElementById('matrixGridTarget');
             if(!canvasTarget || !matrixGridTarget) return; 
             
@@ -761,6 +810,10 @@
             const ordinalShift = parseFloat(document.getElementById('oShiftInput').value);
             const rankScaleFactor24 = parseInt(document.getElementById('rScale24Input').value) / 100;
             const rankScaleFactor58 = parseInt(document.getElementById('rScale58Input').value) / 100;
+            
+            const cornerOutline = parseInt(document.getElementById('cOutlineInput').value);
+            const nameOutline = parseInt(document.getElementById('nOutlineInput').value);
+            const twitterOutline = parseInt(document.getElementById('tOutlineInput').value);
             
             const cornerTextPadding = document.getElementById('cPadInput').value;
             const playerNameSize = parseInt(document.getElementById('nSizeInput').value);
@@ -830,6 +883,10 @@
             document.getElementById('blSizeVal').innerText = sizeBL + "px";
             document.getElementById('brSizeVal').innerText = sizeBR + "px";
             
+            document.getElementById('cOutlineVal').innerText = cornerOutline + "px";
+            document.getElementById('nOutlineVal').innerText = nameOutline + "px";
+            document.getElementById('tOutlineVal').innerText = twitterOutline + "px";
+            
             document.getElementById('nSizeVal').innerText = playerNameSize + "px";
             document.getElementById('tSizeVal').innerText = twitterNameSize + "px";
             document.getElementById('ntGap1Val').innerText = document.getElementById('ntGap1Input').value + "px";
@@ -849,6 +906,9 @@
             
             canvasTarget.style.setProperty('--corner-max-width-top', cornerMaxTextWidthTop + "px");
             canvasTarget.style.setProperty('--corner-max-width-bottom', cornerMaxTextWidthBottom + "px");
+            
+            let cShadow = cornerOutline > 0 ? `${cornerOutline}px ${cornerOutline}px 0 #000, -${cornerOutline}px -${cornerOutline}px 0 #000, ${cornerOutline}px -${cornerOutline}px 0 #000, -${cornerOutline}px ${cornerOutline}px 0 #000, 0px ${cornerOutline}px 0 #000, 0px -${cornerOutline}px 0 #000, ${cornerOutline}px 0px 0 #000, -${cornerOutline}px 0px 0 #000` : 'none';
+            canvasTarget.style.setProperty('--corner-outline', cShadow);
             
             matrixGridTarget.style.transform = `scale(${horizontalScale / 100})`;
 
@@ -877,7 +937,7 @@
             });
 
             for (let i = 1; i <= 8; i++) {
-                const name1 = document.getElementById(`name1-${i}`).value;
+                let name1 = document.getElementById(`name1-${i}`).value;
                 let tw1 = document.getElementById(`tw1-${i}`).value.trim();
                 if (tw1 && !tw1.startsWith('@')) tw1 = '@' + tw1;
 
@@ -889,13 +949,19 @@
                 const char2Key = document.getElementById(`c2-${i}`).value;
                 const gemKey = document.getElementById(`gem-${i}`).value;
 
+                // Fallback to "Player X" if the input is empty but a character is selected
+                if (!name1 && (char1Key || char2Key)) {
+                    name1 = `Player ${i}`;
+                }
+
                 const frameNode = document.getElementById(`frame-${i}`);
                 const imgContainer = document.getElementById(`img-container-${i}`);
                 const metaContainer = document.getElementById(`meta-${i}`);
                 const textOverlayContainer = document.getElementById(`overlay-${i}`);
                 const rankNode = document.getElementById(`rank-${i}`);
 
-                if (!name1 && !tw1 && !name2 && !tw2 && !char1Key && !char2Key && !gemKey) {
+                // Hide the frame if no names, handles, or characters are selected (ignore Gem value)
+                if (!name1 && !tw1 && !name2 && !tw2 && !char1Key && !char2Key) {
                     frameNode.classList.add('hidden-empty');
                     continue;
                 }
@@ -922,6 +988,9 @@
                 
                 const scaledNameFont = Math.round(playerNameSize * scalar);
                 const scaledTwitterFont = Math.round(twitterNameSize * scalar);
+                
+                const scaledNameOutline = Math.round(nameOutline * scalar);
+                const scaledTwitterOutline = Math.round(twitterOutline * scalar);
                 
                 const maxBannerHeightInPx = Math.round(170 * structuralTierScalar * (parseInt(bannerMaxHeight) / 100));
                 const scaledTwitterPadding = Math.round(twitterBottomPadding * structuralTierScalar);
@@ -1015,11 +1084,23 @@
                 // Pull directly from the live UI inputs instead of the static map database
                 const char1URL = validChar1Key ? document.getElementById(`char-url-config-${validChar1Key}`).value : "";
                 const char2URL = validChar2Key ? document.getElementById(`char-url-config-${validChar2Key}`).value : "";
-                const char1Offset = validChar1Key ? parseInt(document.getElementById(`char-offset-config-${validChar1Key}`).value) : 0;
-                const char2Offset = validChar2Key ? parseInt(document.getElementById(`char-offset-config-${validChar2Key}`).value) : 0;
                 
-                const scaledChar1Offset = Math.round(char1Offset * structuralTierScalar);
-                const scaledChar2Offset = Math.round(char2Offset * structuralTierScalar);
+                const char1HOffset = validChar1Key ? parseInt(document.getElementById(`char-h-offset-config-${validChar1Key}`).value) : 0;
+                const char2HOffset = validChar2Key ? parseInt(document.getElementById(`char-h-offset-config-${validChar2Key}`).value) : 0;
+                const char1DOffset = validChar1Key ? parseInt(document.getElementById(`char-tl-xoffset-config-${validChar1Key}`).value) : 0;
+                const char2DOffset = validChar2Key ? parseInt(document.getElementById(`char-br-xoffset-config-${validChar2Key}`).value) : 0;
+                
+                const char1TLZoom = validChar1Key ? parseInt(document.getElementById(`char-tl-zoom-config-${validChar1Key}`).value) / 100 : 1;
+                const char1TLVOffset = validChar1Key ? parseInt(document.getElementById(`char-tl-voffset-config-${validChar1Key}`).value) : 0;
+                const char2BRZoom = validChar2Key ? parseInt(document.getElementById(`char-br-zoom-config-${validChar2Key}`).value) / 100 : 1;
+                const char2BRVOffset = validChar2Key ? parseInt(document.getElementById(`char-br-voffset-config-${validChar2Key}`).value) : 0;
+                
+                const scaledChar1HOffset = Math.round(char1HOffset * structuralTierScalar);
+                const scaledChar2HOffset = Math.round(char2HOffset * structuralTierScalar);
+                const scaledChar1DOffset = Math.round(char1DOffset * structuralTierScalar);
+                const scaledChar2DOffset = Math.round(char2DOffset * structuralTierScalar);
+                const scaledChar1TLVOffset = Math.round(char1TLVOffset * structuralTierScalar);
+                const scaledChar2BRVOffset = Math.round(char2BRVOffset * structuralTierScalar);
                 
                 const currentGemURL = validGemKey ? document.getElementById(`gem-url-config-${validGemKey}`).value : "";
 
@@ -1029,16 +1110,41 @@
 
                 let imageHTML = '';
                 if (char1URL && char2URL) {
-                    imageHTML = `
-                        <div class="pane-split-container">
-                            <div class="pane-half"><img src="${char1URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar1Offset}px);"></div>
-                            <div class="pane-divider-group" style="width: ${bW * 2 + wW}px;">
-                                <div class="pane-divider-black-l" style="width: ${bW}px;"></div>
-                                <div class="pane-divider-white" style="width: ${wW}px;"></div>
-                                <div class="pane-divider-black-r" style="width: ${bW}px;"></div>
-                            </div>
-                            <div class="pane-half"><img src="${char2URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar2Offset}px);"></div>
-                        </div>`;
+                    if (splitType === 'vertical') {
+                        imageHTML = `
+                            <div class="pane-split-container">
+                                <div class="pane-half"><img src="${char1URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar1HOffset}px);"></div>
+                                <div class="pane-divider-group" style="width: ${bW * 2 + wW}px;">
+                                    <div class="pane-divider-black-l" style="width: ${bW}px;"></div>
+                                    <div class="pane-divider-white" style="width: ${wW}px;"></div>
+                                    <div class="pane-divider-black-r" style="width: ${bW}px;"></div>
+                                </div>
+                                <div class="pane-half"><img src="${char2URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar2HOffset}px);"></div>
+                            </div>`;
+                    } else {
+                        const slotHeight = (i === 1) ? 355 : (i <= 4 ? 170 : 160);
+                        const angle = Math.atan2(slotHeight, widthBound) * (180 / Math.PI);
+                        imageHTML = `
+                            <div style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; overflow: hidden; background-color: #000;">
+                                <img src="${char1URL}" crossorigin="anonymous" style="position: absolute; width: 100%; height: 100%; object-fit: cover; top: ${scaledChar1TLVOffset}px; left: ${scaledChar1DOffset}px; transform: scale(${char1TLZoom}); z-index: 1;">
+                                
+                                <div style="position: absolute; top: 50%; left: 50%; width: 300%; height: 300%; transform: translate(-50%, -50%) rotate(-${angle}deg); z-index: 2;">
+                                    
+                                    <div style="position: absolute; top: 50%; left: 0; width: 100%; height: 50%; overflow: hidden;">
+                                        
+                                        <div style="position: absolute; top: 0; left: 50%; width: ${widthBound}px; height: ${slotHeight}px; transform: translate(-50%, -50%) rotate(${angle}deg);">
+                                            <img src="${char2URL}" crossorigin="anonymous" style="position: absolute; width: 100%; height: 100%; object-fit: cover; top: ${scaledChar2BRVOffset}px; left: ${scaledChar2DOffset}px; transform: scale(${char2BRZoom});">
+                                        </div>
+                                    </div>
+                                    
+                                    <div style="position: absolute; top: 50%; left: 0; width: 100%; transform: translateY(-50%); display: flex; flex-direction: column;">
+                                        <div style="height: ${bW}px; background-color: #000; width: 100%;"></div>
+                                        <div style="height: ${wW}px; background-color: #fff; width: 100%;"></div>
+                                        <div style="height: ${bW}px; background-color: #000; width: 100%;"></div>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
                 } else if (char1URL || char2URL) {
                     imageHTML = `<img class="char-full" src="${char1URL || char2URL}" crossorigin="anonymous">`;
                 }
@@ -1085,11 +1191,11 @@
                     const shrinkPct58 = parseInt(document.getElementById('shrink58Input').value) / 100;
                     const currentShrinkScale = (i === 1) ? shrinkPct1 : (i <= 4 ? shrinkPct24 : shrinkPct58);
                     
-                    const resName1 = getFitTextHTML(name1, scaledNameFont, availableTextWidth, false, false, currentShrinkScale);
-                    const resTw1 = getFitTextHTML(tw1, scaledTwitterFont, availableTextWidth, true, resName1.isReduced, currentShrinkScale);
+                    const resName1 = getFitTextHTML(name1, scaledNameFont, availableTextWidth, false, false, currentShrinkScale, scaledNameOutline);
+                    const resTw1 = getFitTextHTML(tw1, scaledTwitterFont, availableTextWidth, true, resName1.isReduced, currentShrinkScale, scaledTwitterOutline);
                     
-                    const resName2 = getFitTextHTML(name2, scaledNameFont, availableTextWidth, false, false, currentShrinkScale);
-                    const resTw2 = getFitTextHTML(tw2, scaledTwitterFont, availableTextWidth, true, resName2.isReduced, currentShrinkScale);
+                    const resName2 = getFitTextHTML(name2, scaledNameFont, availableTextWidth, false, false, currentShrinkScale, scaledNameOutline);
+                    const resTw2 = getFitTextHTML(tw2, scaledTwitterFont, availableTextWidth, true, resName2.isReduced, currentShrinkScale, scaledTwitterOutline);
                     
                     let completeLayoutHTML = '';
                     
