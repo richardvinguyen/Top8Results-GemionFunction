@@ -291,18 +291,40 @@
                     <div class="input-group"><label>5-8 Black <span id="b3Val" class="range-value">1px</span></label><input type="range" id="b3Input" min="1" max="12" value="1" oninput="updateCanvas()"></div>
                 </div>
 
-                <h3>Typography Sizes & Positions</h3>
+                <h3 style="margin-top: 15px;">Placing Number Styling</h3>
                 <div class="form-row">
-                    <div class="input-group"><label>Placing Num Size <span id="pSizeVal" class="range-value">72px</span></label><input type="range" id="pSizeInput" min="42" max="100" value="72" oninput="updateCanvas()"></div>
-                    <div class="input-group"><label>Corner Padding <span id="cPadVal" class="range-value">30px</span></label><input type="range" id="cPadInput" min="0" max="60" value="30" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>1st Place Num Size <span id="pSizeVal" class="range-value">72px</span></label><input type="range" id="pSizeInput" min="42" max="100" value="72" oninput="updateCanvas()"></div>
+                    <div class="input-group">
+                        <label>Placing Ordinal Indicator</label>
+                        <select id="ordinalInput" onchange="updateCanvas()">
+                            <option value="none">None</option>
+                            <option value="super" selected>Superscript</option>
+                            <option value="sub">Subscript</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>Ordinal Scale % <span id="ordinalScaleVal" class="range-value">55%</span></label><input type="range" id="ordinalScaleInput" min="20" max="100" value="55" oninput="updateCanvas()"></div>
                 </div>
                 <div class="form-row">
                     <div class="input-group"><label>Placing 2-4 Num Scale % <span id="rScale24Val" class="range-value">60%</span></label><input type="range" id="rScale24Input" min="40" max="100" value="60" oninput="updateCanvas()"></div>
                     <div class="input-group"><label>Placing 5-8 Num Scale % <span id="rScale58Val" class="range-value">50%</span></label><input type="range" id="rScale58Input" min="40" max="100" value="50" oninput="updateCanvas()"></div>
                 </div>
                 <div class="form-row">
-                    <div class="input-group"><label>Placing Outline Shadow <span id="pShadowVal" class="range-value">4px</span></label><input type="range" id="pShadowInput" min="0" max="12" value="4" oninput="updateCanvas()"></div>
-                    <div class="input-group"><label>Placing Drop Shadow <span id="pDropVal" class="range-value">7px</span></label><input type="range" id="pDropInput" min="0" max="25" value="7" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Num Outline Shadow <span id="pShadowVal" class="range-value">4px</span></label><input type="range" id="pShadowInput" min="0" max="12" value="4" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Num Drop Shadow <span id="pDropVal" class="range-value">5px</span></label><input type="range" id="pDropInput" min="0" max="25" value="5" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>Ordinal Outline Shadow <span id="oShadowVal" class="range-value">2px</span></label><input type="range" id="oShadowInput" min="0" max="12" value="2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Ordinal Drop Shadow <span id="oDropVal" class="range-value">5px</span></label><input type="range" id="oDropInput" min="0" max="25" value="5" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>1st Ordinal X-Margin <span id="oMargin1Val" class="range-value">-0.2em</span></label><input type="range" id="oMargin1Input" min="-1" max="1" step="0.01" value="-0.2" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>4th Ordinal X-Margin <span id="oMargin4Val" class="range-value">-0.13em</span></label><input type="range" id="oMargin4Input" min="-1" max="1" step="0.01" value="-0.13" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>Ordinal Y-Shift <span id="oShiftVal" class="range-value">-0.05em</span></label><input type="range" id="oShiftInput" min="-1" max="1" step="0.01" value="-0.05" oninput="updateCanvas()"></div>
+                </div>
+
+                <h3 style="margin-top: 15px;">Corner Texts</h3>
+                <div class="form-row">
+                    <div class="input-group"><label>Corner Padding <span id="cPadVal" class="range-value">30px</span></label><input type="range" id="cPadInput" min="0" max="60" value="30" oninput="updateCanvas()"></div>
                 </div>
                 <div class="form-row">
                     <div class="input-group"><label>Top-Left Size <span id="tlSizeVal" class="range-value">18px</span></label><input type="range" id="tlSizeInput" min="8" max="48" value="18" oninput="updateCanvas()"></div>
@@ -316,6 +338,8 @@
                     <div class="input-group"><label>Corner Text Max Width Top <span id="cMaxWidthTopVal" class="range-value">230px</span></label><input type="range" id="cMaxWidthTopInput" min="200" max="400" value="230" oninput="updateCanvas()"></div>
                     <div class="input-group"><label>Corner Text Max Width Bottom <span id="cMaxWidthBottomVal" class="range-value">300px</span></label><input type="range" id="cMaxWidthBottomInput" min="200" max="400" value="300" oninput="updateCanvas()"></div>
                 </div>
+
+                <h3 style="margin-top: 15px;">Player Details</h3>
                 <div class="form-row">
                     <div class="input-group"><label>Player Name Size <span id="nSizeVal" class="range-value">32px</span></label><input type="range" id="nSizeInput" min="14" max="64" value="32" oninput="updateCanvas()"></div>
                     <div class="input-group"><label>Twitter Size <span id="tSizeVal" class="range-value">20px</span></label><input type="range" id="tSizeInput" min="8" max="54" value="20" oninput="updateCanvas()"></div>
@@ -325,8 +349,21 @@
                     <div class="input-group"><label>Placing 5-8 Font Scale % <span id="scale58ValueDisplay" class="range-value">50%</span></label><input type="range" id="scale58Input" min="50" max="100" value="50" oninput="updateCanvas()"></div>
                 </div>
                 <div class="form-row">
-                    <div class="input-group"><label>Name-Twitter Gap <span id="ntGapVal" class="range-value">0px</span></label><input type="range" id="ntGapInput" min="-20" max="16" value="0" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>1st Long Text Shrink % <span id="shrink1Val" class="range-value">80%</span></label><input type="range" id="shrink1Input" min="20" max="100" value="80" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>2-4 Long Text Shrink % <span id="shrink24Val" class="range-value">75%</span></label><input type="range" id="shrink24Input" min="20" max="100" value="75" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>5-8 Long Text Shrink % <span id="shrink58Val" class="range-value">71%</span></label><input type="range" id="shrink58Input" min="20" max="100" value="71" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
+                    <div class="input-group"><label>1st Name-Tw Gap <span id="ntGap1Val" class="range-value">-4px</span></label><input type="range" id="ntGap1Input" min="-20" max="16" value="-4" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>2-4 Name-Tw Gap <span id="ntGap24Val" class="range-value">-3px</span></label><input type="range" id="ntGap24Input" min="-20" max="16" value="-3" oninput="updateCanvas()"></div>
+                    <div class="input-group"><label>5-8 Name-Tw Gap <span id="ntGap58Val" class="range-value">-1px</span></label><input type="range" id="ntGap58Input" min="-20" max="16" value="-1" oninput="updateCanvas()"></div>
+                </div>
+                <div class="form-row">
                     <div class="input-group"><label>Twitter Bottom Padding <span id="tBotPadVal" class="range-value">5px</span></label><input type="range" id="tBotPadInput" min="0" max="24" value="5" oninput="updateCanvas()"></div>
+                </div>
+
+                <h3 style="margin-top: 15px;">Player Banner Box</h3>
+                <div class="form-row">
                     <div class="input-group"><label>Banner Max H% <span id="bHeightVal" class="range-value">35%</span></label><input type="range" id="bHeightInput" min="10" max="50" value="35" oninput="updateCanvas()"></div>
                     <div class="input-group"><label>Banner Slant Angle <span id="slantVal" class="range-value">-25px</span></label><input type="range" id="slantInput" min="-25" max="25" value="-25" oninput="updateCanvas()"></div>
                 </div>
@@ -583,7 +620,7 @@
                 </div>`;
         });
 
-        function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction) {
+        function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction, shrinkScale) {
             if (!textString) return { html: '', isReduced: false };
             
             const canvas = document.createElement('canvas');
@@ -596,13 +633,14 @@
             
             if (!isHandle) {
                 if (ctx.measureText(textString).width > maxWidth) {
-                    targetSize = Math.round(baseFontSize * 0.50);
+                    targetSize = Math.round(baseFontSize * shrinkScale);
                     ctx.font = `bold ${targetSize}px "Arial Black"`;
                     wasReduced = true;
                 }
             } else {
                 if (forceHandleReduction || ctx.measureText(textString).width > maxWidth) {
-                    targetSize = Math.round(baseFontSize * 0.75);
+                    let handleScale = Math.min(1.0, shrinkScale * 1.5);
+                    targetSize = Math.round(baseFontSize * handleScale);
                     ctx.font = `bold ${targetSize}px sans-serif`;
                     wasReduced = true;
                 }
@@ -712,15 +750,21 @@
             const cornerTriangleHeightMultiplier = parseInt(document.getElementById('cHeightScaleInput').value) / 100;
 
             const placingNumBaseSize = parseInt(document.getElementById('pSizeInput').value);
+            const ordinalStyle = document.getElementById('ordinalInput').value;
+            const ordinalScale = parseInt(document.getElementById('ordinalScaleInput').value) / 100;
             const rankShadowThickness = parseInt(document.getElementById('pShadowInput').value);
             const rankDropShadowDist = parseInt(document.getElementById('pDropInput').value);
+            const ordinalShadowThickness = parseInt(document.getElementById('oShadowInput').value);
+            const ordinalDropShadowDist = parseInt(document.getElementById('oDropInput').value);
+            const ordinalMargin1 = parseFloat(document.getElementById('oMargin1Input').value);
+            const ordinalMargin4 = parseFloat(document.getElementById('oMargin4Input').value);
+            const ordinalShift = parseFloat(document.getElementById('oShiftInput').value);
             const rankScaleFactor24 = parseInt(document.getElementById('rScale24Input').value) / 100;
             const rankScaleFactor58 = parseInt(document.getElementById('rScale58Input').value) / 100;
             
             const cornerTextPadding = document.getElementById('cPadInput').value;
             const playerNameSize = parseInt(document.getElementById('nSizeInput').value);
             const twitterNameSize = parseInt(document.getElementById('tSizeInput').value);
-            const nameTwitterGap = parseInt(document.getElementById('ntGapInput').value);
             const twitterBottomPadding = parseInt(document.getElementById('tBotPadInput').value);
             const bannerMaxHeight = document.getElementById('bHeightInput').value;
             const bannerSlantAngle = parseInt(document.getElementById('slantInput').value);
@@ -755,6 +799,9 @@
             document.getElementById('cHeightScaleValueDisplay').innerText = document.getElementById('cHeightScaleInput').value + "%";
             document.getElementById('scale24ValueDisplay').innerText = document.getElementById('scale24Input').value + "%";
             document.getElementById('scale58ValueDisplay').innerText = document.getElementById('scale58Input').value + "%";
+            document.getElementById('shrink1Val').innerText = document.getElementById('shrink1Input').value + "%";
+            document.getElementById('shrink24Val').innerText = document.getElementById('shrink24Input').value + "%";
+            document.getElementById('shrink58Val').innerText = document.getElementById('shrink58Input').value + "%";
             document.getElementById('gemScaleValueDisplay').innerText = baseGemScale + "px";
             document.getElementById('gemPaddingValueDisplay').innerText = gemPaddingOffset + "px";
             document.getElementById('vPaddingValueDisplay').innerText = canvasVPadding + "px";
@@ -763,8 +810,14 @@
             document.getElementById('w3Val').innerText = divWeights.w3 + "px"; document.getElementById('b3Val').innerText = divWeights.b3 + "px";
             
             document.getElementById('pSizeVal').innerText = placingNumBaseSize + "px";
+            document.getElementById('ordinalScaleVal').innerText = document.getElementById('ordinalScaleInput').value + "%";
             document.getElementById('pShadowVal').innerText = rankShadowThickness + "px";
             document.getElementById('pDropVal').innerText = rankDropShadowDist + "px";
+            document.getElementById('oShadowVal').innerText = ordinalShadowThickness + "px";
+            document.getElementById('oDropVal').innerText = ordinalDropShadowDist + "px";
+            document.getElementById('oMargin1Val').innerText = ordinalMargin1 + "em";
+            document.getElementById('oMargin4Val').innerText = ordinalMargin4 + "em";
+            document.getElementById('oShiftVal').innerText = ordinalShift + "em";
             document.getElementById('rScale24Val').innerText = document.getElementById('rScale24Input').value + "%";
             document.getElementById('rScale58Val').innerText = document.getElementById('rScale58Input').value + "%";
             document.getElementById('cPadVal').innerText = cornerTextPadding + "px";
@@ -779,7 +832,9 @@
             
             document.getElementById('nSizeVal').innerText = playerNameSize + "px";
             document.getElementById('tSizeVal').innerText = twitterNameSize + "px";
-            document.getElementById('ntGapVal').innerText = nameTwitterGap + "px";
+            document.getElementById('ntGap1Val').innerText = document.getElementById('ntGap1Input').value + "px";
+            document.getElementById('ntGap24Val').innerText = document.getElementById('ntGap24Input').value + "px";
+            document.getElementById('ntGap58Val').innerText = document.getElementById('ntGap58Input').value + "px";
             document.getElementById('bHeightVal').innerText = bannerMaxHeight + "%";
             document.getElementById('slantVal').innerText = bannerSlantAngle + "px";
             document.getElementById('gw1Val').innerText = middleW1 + "px"; document.getElementById('gb1Val').innerText = innerB1 + "px";
@@ -862,13 +917,20 @@
                 const scaledRankShadow = Math.round(rankShadowThickness * rankTierScalar);
                 const scaledRankDrop = Math.round(rankDropShadowDist * rankTierScalar);
                 
+                const scaledOrdinalShadow = Math.round(ordinalShadowThickness * rankTierScalar);
+                const scaledOrdinalDrop = Math.round(ordinalDropShadowDist * rankTierScalar);
+                
                 const scaledNameFont = Math.round(playerNameSize * scalar);
                 const scaledTwitterFont = Math.round(twitterNameSize * scalar);
                 
                 const maxBannerHeightInPx = Math.round(170 * structuralTierScalar * (parseInt(bannerMaxHeight) / 100));
                 const scaledTwitterPadding = Math.round(twitterBottomPadding * structuralTierScalar);
                 const scaledSlantAngle = Math.round(bannerSlantAngle * structuralTierScalar);
-                const scaledNameTwitterGap = Math.round(nameTwitterGap * structuralTierScalar);
+                
+                const gap1 = parseInt(document.getElementById('ntGap1Input').value);
+                const gap24 = parseInt(document.getElementById('ntGap24Input').value);
+                const gap58 = parseInt(document.getElementById('ntGap58Input').value);
+                const currentNameTwitterGap = (i === 1) ? gap1 : (i <= 4 ? gap24 : gap58);
 
                 frameNode.style.borderColor = primaryColor;
                 frameNode.style.borderWidth = `${scaledBorder}px`;
@@ -879,24 +941,59 @@
                 
                 // Gap overlay seal Fix: Expand frame background layer height +1px to organically overlap outer CSS borders
                 metaContainer.style.height = (maxBannerHeightInPx + 1) + "px";
+                metaContainer.style.background = "transparent";
                 
-                // Pure rgba transition removes anti-aliasing bleeds inside html2canvas grid captures
-                const transColor = getTransparentColor(primaryColor);
-
+                // Calculate precise inner width to perfectly fit the border triangles
+                const innerBannerWidth = widthBound - (scaledBorder * 2) + 2;
+                
+                // Construct the slanted banner using solid CSS borders to eliminate gradient gaps
+                let metaHTML = '';
                 if (scaledSlantAngle === 0) {
-                    metaContainer.style.background = primaryColor;
+                    metaHTML = `<div style="background-color: ${primaryColor}; width: 100%; height: 100%;"></div>`;
                 } else if (scaledSlantAngle < 0) {
-                    const anglePct = (leftOffset / maxBannerHeightInPx) * 100;
-                    metaContainer.style.background = `linear-gradient(to bottom right, ${transColor} ${anglePct}%, ${primaryColor} ${anglePct}%)`;
+                    metaHTML = `
+                        <div style="position: absolute; top: 0; right: 0; width: 0; height: 0; border-bottom: ${leftOffset}px solid ${primaryColor}; border-left: ${innerBannerWidth}px solid transparent;"></div>
+                        <div style="position: absolute; top: ${leftOffset - 1}px; bottom: 0; left: 0; right: 0; background-color: ${primaryColor};"></div>
+                    `;
                 } else {
-                    const anglePct = (rightOffset / maxBannerHeightInPx) * 100;
-                    metaContainer.style.background = `linear-gradient(to bottom left, ${transColor} ${anglePct}%, ${primaryColor} ${anglePct}%)`;
+                    metaHTML = `
+                        <div style="position: absolute; top: 0; left: 0; width: 0; height: 0; border-bottom: ${rightOffset}px solid ${primaryColor}; border-right: ${innerBannerWidth}px solid transparent;"></div>
+                        <div style="position: absolute; top: ${rightOffset - 1}px; bottom: 0; left: 0; right: 0; background-color: ${primaryColor};"></div>
+                    `;
                 }
+                metaContainer.innerHTML = metaHTML;
 
                 textOverlayContainer.style.height = `${(170 * structuralTierScalar) - scaledBorder}px`;
                 textOverlayContainer.style.paddingBottom = `${scaledTwitterPadding}px`;
 
                 rankNode.style.fontSize = scaledRankFont + "px";
+                
+                // Calculate current rank number (1-4 unique, 5/6 = 5th, 7/8 = 7th)
+                let rankNumber = (i <= 4) ? i : (i <= 6 ? 5 : 7);
+                let suffixText = (rankNumber === 1) ? "st" : (rankNumber === 2 ? "nd" : (rankNumber === 3 ? "rd" : "th"));
+                
+                let ordinalShadows = [];
+                if (scaledOrdinalShadow > 0) {
+                    ordinalShadows.push(`${scaledOrdinalShadow}px ${scaledOrdinalShadow}px 0 #000, -${scaledOrdinalShadow}px -${scaledOrdinalShadow}px 0 #000, ${scaledOrdinalShadow}px -${scaledOrdinalShadow}px 0 #000, -${scaledOrdinalShadow}px ${scaledOrdinalShadow}px 0 #000`);
+                }
+                if (scaledOrdinalDrop > 0) {
+                    ordinalShadows.push(`${scaledOrdinalDrop}px ${scaledOrdinalDrop}px 0 rgba(0,0,0,0.8)`);
+                }
+                let ordinalShadowStyle = ordinalShadows.length > 0 ? `text-shadow: ${ordinalShadows.join(', ')};` : `text-shadow: none;`;
+                
+                let ordinalMarginStyle = "";
+                if (rankNumber === 1) ordinalMarginStyle = `margin-left: ${ordinalMargin1}em;`;
+                else if (rankNumber === 4) ordinalMarginStyle = `margin-left: ${ordinalMargin4}em;`;
+                
+                let ordinalPositionStyle = `position: relative; top: ${ordinalShift}em;`;
+                
+                if (ordinalStyle === "super") {
+                    rankNode.innerHTML = `${rankNumber}<sup style="font-size: ${ordinalScale}em; ${ordinalMarginStyle} ${ordinalPositionStyle} ${ordinalShadowStyle}">${suffixText}</sup>`;
+                } else if (ordinalStyle === "sub") {
+                    rankNode.innerHTML = `${rankNumber}<sub style="font-size: ${ordinalScale}em; ${ordinalMarginStyle} ${ordinalPositionStyle} ${ordinalShadowStyle}">${suffixText}</sub>`;
+                } else {
+                    rankNode.innerHTML = `${rankNumber}`;
+                }
                 
                 let rankShadows = [];
                 if (scaledRankShadow > 0) {
@@ -915,11 +1012,16 @@
                 const validChar2Key = getMapKeyInsensitive(charEnumMap, char2Key);
                 const validGemKey = getMapKeyInsensitive(gemEnumMap, gemKey);
 
-                const char1URL = validChar1Key ? charEnumMap[validChar1Key].url : "";
-                const char2URL = validChar2Key ? charEnumMap[validChar2Key].url : "";
-                const char1Offset = validChar1Key ? parseInt(charEnumMap[validChar1Key].offset) : 0;
-                const char2Offset = validChar2Key ? parseInt(charEnumMap[validChar2Key].offset) : 0;
-                const currentGemURL = validGemKey ? gemEnumMap[validGemKey] : "";
+                // Pull directly from the live UI inputs instead of the static map database
+                const char1URL = validChar1Key ? document.getElementById(`char-url-config-${validChar1Key}`).value : "";
+                const char2URL = validChar2Key ? document.getElementById(`char-url-config-${validChar2Key}`).value : "";
+                const char1Offset = validChar1Key ? parseInt(document.getElementById(`char-offset-config-${validChar1Key}`).value) : 0;
+                const char2Offset = validChar2Key ? parseInt(document.getElementById(`char-offset-config-${validChar2Key}`).value) : 0;
+                
+                const scaledChar1Offset = Math.round(char1Offset * structuralTierScalar);
+                const scaledChar2Offset = Math.round(char2Offset * structuralTierScalar);
+                
+                const currentGemURL = validGemKey ? document.getElementById(`gem-url-config-${validGemKey}`).value : "";
 
                 let bW = divWeights.b3, wW = divWeights.w3;
                 if (i === 1) { bW = divWeights.b1; wW = divWeights.w1; }
@@ -929,13 +1031,13 @@
                 if (char1URL && char2URL) {
                     imageHTML = `
                         <div class="pane-split-container">
-                            <div class="pane-half"><img src="${char1URL}" crossorigin="anonymous" style="left: calc(-50% + ${char1Offset}px);"></div>
+                            <div class="pane-half"><img src="${char1URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar1Offset}px);"></div>
                             <div class="pane-divider-group" style="width: ${bW * 2 + wW}px;">
                                 <div class="pane-divider-black-l" style="width: ${bW}px;"></div>
                                 <div class="pane-divider-white" style="width: ${wW}px;"></div>
                                 <div class="pane-divider-black-r" style="width: ${bW}px;"></div>
                             </div>
-                            <div class="pane-half"><img src="${char2URL}" crossorigin="anonymous" style="left: calc(-50% + ${char2Offset}px);"></div>
+                            <div class="pane-half"><img src="${char2URL}" crossorigin="anonymous" style="left: calc(-50% + ${scaledChar2Offset}px);"></div>
                         </div>`;
                 } else if (char1URL || char2URL) {
                     imageHTML = `<img class="char-full" src="${char1URL || char2URL}" crossorigin="anonymous">`;
@@ -966,6 +1068,7 @@
                                         background-image: url('${currentGemURL}'); 
                                         background-size: cover; background-position: center; 
                                         width: ${scaledGemSize}px; height: ${scaledGemSize}px;
+                                        image-rendering: pixelated;
                                     "></div>
                                 </div>
                             </div>
@@ -977,27 +1080,35 @@
                     metaContainer.style.display = 'block';
                     textOverlayContainer.style.display = 'flex';
                     
-                    const resName1 = getFitTextHTML(name1, scaledNameFont, availableTextWidth, false, false);
-                    const resTw1 = getFitTextHTML(tw1, scaledTwitterFont, availableTextWidth, true, resName1.isReduced);
+                    const shrinkPct1 = parseInt(document.getElementById('shrink1Input').value) / 100;
+                    const shrinkPct24 = parseInt(document.getElementById('shrink24Input').value) / 100;
+                    const shrinkPct58 = parseInt(document.getElementById('shrink58Input').value) / 100;
+                    const currentShrinkScale = (i === 1) ? shrinkPct1 : (i <= 4 ? shrinkPct24 : shrinkPct58);
                     
-                    const resName2 = getFitTextHTML(name2, scaledNameFont, availableTextWidth, false, false);
-                    const resTw2 = getFitTextHTML(tw2, scaledTwitterFont, availableTextWidth, true, resName2.isReduced);
+                    const resName1 = getFitTextHTML(name1, scaledNameFont, availableTextWidth, false, false, currentShrinkScale);
+                    const resTw1 = getFitTextHTML(tw1, scaledTwitterFont, availableTextWidth, true, resName1.isReduced, currentShrinkScale);
+                    
+                    const resName2 = getFitTextHTML(name2, scaledNameFont, availableTextWidth, false, false, currentShrinkScale);
+                    const resTw2 = getFitTextHTML(tw2, scaledTwitterFont, availableTextWidth, true, resName2.isReduced, currentShrinkScale);
                     
                     let completeLayoutHTML = '';
                     
                     if (name1) completeLayoutHTML += resName1.html;
                     if (tw1) {
-                        if (name1) completeLayoutHTML += `<div style="height: ${scaledNameTwitterGap}px; width: 100%;"></div>`;
-                        completeLayoutHTML += resTw1.html;
+                        if (name1) completeLayoutHTML += `<div style="margin-top: ${currentNameTwitterGap}px; width: 100%;">${resTw1.html}</div>`;
+                        else completeLayoutHTML += resTw1.html;
                     }
                     if (name2) {
                         if (name1 || tw1) completeLayoutHTML += `<div style="height: ${Math.max(2, Math.round(4 * structuralTierScalar))}px; width: 100%;"></div>`;
                         completeLayoutHTML += resName2.html;
                     }
                     if (tw2) {
-                        if (name2) completeLayoutHTML += `<div style="height: ${scaledNameTwitterGap}px; width: 100%;"></div>`;
-                        else if (name1 || tw1) completeLayoutHTML += `<div style="height: ${Math.max(2, Math.round(4 * structuralTierScalar))}px; width: 100%;"></div>`;
-                        completeLayoutHTML += resTw2.html;
+                        if (name2) {
+                            completeLayoutHTML += `<div style="margin-top: ${currentNameTwitterGap}px; width: 100%;">${resTw2.html}</div>`;
+                        } else {
+                            if (name1 || tw1) completeLayoutHTML += `<div style="height: ${Math.max(2, Math.round(4 * structuralTierScalar))}px; width: 100%;"></div>`;
+                            completeLayoutHTML += resTw2.html;
+                        }
                     }
                     
                     textOverlayContainer.innerHTML = completeLayoutHTML;

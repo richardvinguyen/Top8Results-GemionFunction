@@ -1,5 +1,5 @@
 const gemEnumMap = {
-    /* These should work locally AND hosted on GitHub. */
+    /* These should work locally AND hosted on GitHub, but cannot save image locally. Switch to below. */
     "Aegis Gem": "assets/gems/AegisGem.png",
     "Blood Gem": "assets/gems/BloodGem.png",
     "Cortex Gem": "assets/gems/CortexGem.png",
@@ -7,7 +7,7 @@ const gemEnumMap = {
     "Havoc Gem": "assets/gems/HavocGem.png",
     "Stardust Gem": "assets/gems/StardustGem.png"
 
-    /* Deprecated; see above comment. */
+    /* Use these to save image locally. */
     /* "Aegis Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150906876952667/AegisGem.png?ex=6a099484&is=6a084304&hm=1417a819bf503055b7546697b0e9cf08b6a9a8733f0a2d51ed170881a02c2150&",
     "Blood Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150907254571121/BloodGem.png?ex=6a099484&is=6a084304&hm=4f97ed8eda65ab2297c5c2e9909fc3b940ab9475570ef9a678ca8b058a5763bc&",
     "Cortex Gem": "https://cdn.discordapp.com/attachments/950601093073743922/1505150907585790084/CortexGem.png?ex=6a099484&is=6a084304&hm=192132b8b6c98b23bb99910a70617c3b5c4fc8c0cdfdee7bad4e7777a6af8126&",
