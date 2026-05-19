@@ -95,7 +95,7 @@
             gap: 25px; transform-origin: center center; width: 936px; height: 355px;
         }
 
-        /* FIX 1: Corner triangles generated via CSS Borders instead of linear-gradients. 
+        /* Corner triangles generated via CSS Borders instead of linear-gradients. 
            This permanently prevents html2canvas from rendering anti-aliased dark/orange bleed lines */
         .graphic-canvas::before, .graphic-canvas::after {
             content: ''; position: absolute; z-index: 2; pointer-events: none;
@@ -462,6 +462,10 @@
         const gemKeys = Object.keys(gemEnumMap);
         const bgKeys = Object.keys(bgEnumMap);
 
+        // Global canvas context strictly for high-performance text width measurements
+        const measureCanvas = document.createElement('canvas');
+        const measureCtx = measureCanvas.getContext('2d');
+
         function toggleSection(id) {
             const el = document.getElementById(id);
             const title = el.previousElementSibling;
@@ -473,6 +477,11 @@
         }
 
         window.handleAutofill = function(inputEl, id, type) {
+            // Force all other open suggestion boxes to close
+            document.querySelectorAll('.autocomplete-suggestions').forEach(box => {
+                if (box.id !== `suggest-${type}-${id}`) box.style.display = 'none';
+            });
+
             const query = inputEl.value.trim().toLowerCase();
             const suggestionBox = document.getElementById(`suggest-${type}-${id}`);
             suggestionBox.innerHTML = '';
@@ -509,6 +518,20 @@
             });
             updateCanvas();
         };
+
+        // Close dropdowns when clicking anywhere else on the page
+        document.addEventListener('click', function(event) {
+            document.querySelectorAll('.autocomplete-suggestions').forEach(box => {
+                // Dynamically find the input field that owns this box
+                const relatedInputId = box.id.replace('suggest-', '');
+                const relatedInput = document.getElementById(relatedInputId);
+                
+                // If the click was not on the input field, and not on the dropdown itself, hide it
+                if (event.target !== relatedInput && !box.contains(event.target)) {
+                    box.style.display = 'none';
+                }
+            });
+        });
 
         function getFormattedOrdinalDate() {
             const d = new Date();
@@ -589,7 +612,7 @@
             return Object.keys(object).find(k => k.toLowerCase() === normalizedKey) || "";
         }
 
-        const randomCount = Math.floor(Math.random() * 3) + 2; 
+        const randomCount = Math.floor(Math.random() * 2) + 0; 
         const chosenNoneSlots = [];
         while (chosenNoneSlots.length < randomCount) {
             const potentialId = Math.floor(Math.random() * 8) + 1;
@@ -606,6 +629,10 @@
             document.getElementById(`c1-${id}`).value = '';
             document.getElementById(`c2-${id}`).value = '';
             document.getElementById(`gem-${id}`).value = '';
+            
+            // Force hide any autocomplete suggestions that were open
+            document.querySelectorAll('.autocomplete-suggestions').forEach(box => box.style.display = 'none');
+            
             updateCanvas();
         };
 
@@ -663,32 +690,32 @@
         function getFitTextHTML(textString, baseFontSize, maxWidth, isHandle, forceHandleReduction, shrinkScale, baseOutlineSize) {
             if (!textString) return { html: '', isReduced: false };
             
-            const canvas = document.createElement('canvas');
-            const ctx = canvas.getContext('2d');
+            // Sanitize brackets so clan tags are not parsed as HTML
+            textString = textString.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             
             let targetSize = baseFontSize;
-            ctx.font = isHandle ? `bold ${targetSize}px sans-serif` : `bold ${targetSize}px "Arial Black"`;
+            measureCtx.font = isHandle ? `bold ${targetSize}px sans-serif` : `bold ${targetSize}px "Arial Black"`;
             
             let wasReduced = false;
             
             if (!isHandle) {
-                if (ctx.measureText(textString).width > maxWidth) {
+                if (measureCtx.measureText(textString).width > maxWidth) {
                     targetSize = Math.round(baseFontSize * shrinkScale);
-                    ctx.font = `bold ${targetSize}px "Arial Black"`;
+                    measureCtx.font = `bold ${targetSize}px "Arial Black"`;
                     wasReduced = true;
                 }
             } else {
-                if (forceHandleReduction || ctx.measureText(textString).width > maxWidth) {
+                if (forceHandleReduction || measureCtx.measureText(textString).width > maxWidth) {
                     let handleScale = Math.min(1.0, shrinkScale * 1.5);
                     targetSize = Math.round(baseFontSize * handleScale);
-                    ctx.font = `bold ${targetSize}px sans-serif`;
+                    measureCtx.font = `bold ${targetSize}px sans-serif`;
                     wasReduced = true;
                 }
             }
             
             let finalOutputString = textString;
-            if (ctx.measureText(finalOutputString).width > maxWidth) {
-                while (ctx.measureText(finalOutputString + '...').width > maxWidth && finalOutputString.length > 0) {
+            if (measureCtx.measureText(finalOutputString).width > maxWidth) {
+                while (measureCtx.measureText(finalOutputString + '...').width > maxWidth && finalOutputString.length > 0) {
                     finalOutputString = finalOutputString.slice(0, -1);
                 }
                 finalOutputString += '...';
@@ -710,6 +737,9 @@
         // Restores 3-line word wrapping engine tracking letter-spacing
         function getFitCornerTextHTML(textString, baseFontSize, maxWidth) {
             if (!textString) return '';
+
+            // Sanitize brackets so clan tags are not parsed as HTML
+            textString = textString.replace(/</g, "&lt;").replace(/>/g, "&gt;");
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -949,8 +979,8 @@
                 const char2Key = document.getElementById(`c2-${i}`).value;
                 const gemKey = document.getElementById(`gem-${i}`).value;
 
-                // Fallback to "Player X" if the input is empty but a character is selected
-                if (!name1 && (char1Key || char2Key)) {
+                // Fallback to "Player X" only if ALL name and handle inputs are completely empty
+                if (!name1 && !tw1 && !name2 && !tw2 && (char1Key || char2Key)) {
                     name1 = `Player ${i}`;
                 }
 
@@ -1008,7 +1038,7 @@
                 const leftOffset = scaledSlantAngle < 0 ? Math.abs(scaledSlantAngle) : 0;
                 const rightOffset = scaledSlantAngle > 0 ? scaledSlantAngle : 0;
                 
-                // Gap overlay seal Fix: Expand frame background layer height +1px to organically overlap outer CSS borders
+                // Gap overlay seal fix: Expand frame background layer height +1px to organically overlap outer CSS borders
                 metaContainer.style.height = (maxBannerHeightInPx + 1) + "px";
                 metaContainer.style.background = "transparent";
                 
@@ -1224,6 +1254,9 @@
                     textOverlayContainer.innerHTML = '';
                 }
             }
+
+            const organizer = document.getElementById('tlInput').value.trim();
+            document.title = organizer ? `${organizer} - Top 8 - Gemion Function` : 'Top 8 - Gemion Function';
         }
 
         function exportFinishedPNG() {
