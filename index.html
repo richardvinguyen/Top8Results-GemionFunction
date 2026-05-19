@@ -441,7 +441,7 @@
         </div>
     </div>
 
-    <script src="assets/characters.js?v=5"></script>
+    <script src="assets/characters.js?v=6"></script>
     <script src="assets/gems.js"></script>
     <script src="assets/players.js"></script>
     <script src="assets/backgrounds.js"></script>
@@ -561,29 +561,29 @@
                     <div class="form-row">
                         <div class="input-group">
                             <label>Diag TL X-Offset: <span id="tl-xoffset-readout-${key}" class="range-value">${charEnumMap[key].tlXOffset || 0}px</span></label>
-                            <input type="range" id="char-tl-xoffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].tlXOffset || 0}" oninput="document.getElementById('tl-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                            <input type="range" id="char-tl-xoffset-config-${key}" min="-125" max="125" value="${charEnumMap[key].tlXOffset || 0}" oninput="document.getElementById('tl-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
                         </div>
                         <div class="input-group">
                             <label>Diag TL Y-Offset: <span id="tl-voffset-readout-${key}" class="range-value">${charEnumMap[key].tlVOffset || 0}px</span></label>
-                            <input type="range" id="char-tl-voffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].tlVOffset || 0}" oninput="document.getElementById('tl-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                            <input type="range" id="char-tl-voffset-config-${key}" min="-125" max="125" value="${charEnumMap[key].tlVOffset || 0}" oninput="document.getElementById('tl-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
                         </div>
                         <div class="input-group">
                             <label>Diag TL Zoom %: <span id="tl-zoom-readout-${key}" class="range-value">${charEnumMap[key].tlZoom !== undefined ? charEnumMap[key].tlZoom : 100}%</span></label>
-                            <input type="range" id="char-tl-zoom-config-${key}" min="75" max="200" value="${charEnumMap[key].tlZoom !== undefined ? charEnumMap[key].tlZoom : 100}" oninput="document.getElementById('tl-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
+                            <input type="range" id="char-tl-zoom-config-${key}" min="75" max="250" value="${charEnumMap[key].tlZoom !== undefined ? charEnumMap[key].tlZoom : 100}" oninput="document.getElementById('tl-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="input-group">
                             <label>Diag BR X-Offset: <span id="br-xoffset-readout-${key}" class="range-value">${charEnumMap[key].brXOffset || 0}px</span></label>
-                            <input type="range" id="char-br-xoffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].brXOffset || 0}" oninput="document.getElementById('br-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                            <input type="range" id="char-br-xoffset-config-${key}" min="-125" max="125" value="${charEnumMap[key].brXOffset || 0}" oninput="document.getElementById('br-xoffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
                         </div>
                         <div class="input-group">
                             <label>Diag BR Y-Offset: <span id="br-voffset-readout-${key}" class="range-value">${charEnumMap[key].brVOffset || 0}px</span></label>
-                            <input type="range" id="char-br-voffset-config-${key}" min="-100" max="100" value="${charEnumMap[key].brVOffset || 0}" oninput="document.getElementById('br-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
+                            <input type="range" id="char-br-voffset-config-${key}" min="-125" max="125" value="${charEnumMap[key].brVOffset || 0}" oninput="document.getElementById('br-voffset-readout-${key}').innerText=this.value+'px'; updateCanvas()">
                         </div>
                         <div class="input-group">
                             <label>Diag BR Zoom %: <span id="br-zoom-readout-${key}" class="range-value">${charEnumMap[key].brZoom !== undefined ? charEnumMap[key].brZoom : 100}%</span></label>
-                            <input type="range" id="char-br-zoom-config-${key}" min="75" max="200" value="${charEnumMap[key].brZoom !== undefined ? charEnumMap[key].brZoom : 100}" oninput="document.getElementById('br-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
+                            <input type="range" id="char-br-zoom-config-${key}" min="75" max="250" value="${charEnumMap[key].brZoom !== undefined ? charEnumMap[key].brZoom : 100}" oninput="document.getElementById('br-zoom-readout-${key}').innerText=this.value+'%'; updateCanvas()">
                         </div>
                     </div>
                 </div>`;
