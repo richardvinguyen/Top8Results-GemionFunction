@@ -6,7 +6,7 @@
 
 **Social Media**:
 * Twitter: https://twitter.com/NagooyenGames
-* Discord: discord.gg/Q77hWs3Zhh
+* Discord: https://discord.gg/Q77hWs3Zhh
 * Email: NagooyenGames@gmail.com
 * TierMaker: https://tiermaker.com/create/gemion-function-19482182
 
