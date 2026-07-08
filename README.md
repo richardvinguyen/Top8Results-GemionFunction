@@ -19,4 +19,7 @@
 **Legal Documentation**:
 * [Privacy Policy](https://richardvinguyen.github.io/GemionFunction/legal/privacy\_policy.html)
 * [End-User License Agreement (EULA)](https://richardvinguyen.github.io/GemionFunction/legal/eula.html)
-* [Website](https://richardvinguyen.github.io/GemionFunction/)
+
+**Website**:
+* [Gemion Function Website](https://richardvinguyen.github.io/GemionFunction/)
+* [Gemion Function Website Source Code](https://github.com/richardvinguyen/GemionFunction)
